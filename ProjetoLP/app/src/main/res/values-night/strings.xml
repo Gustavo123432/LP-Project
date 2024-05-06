@@ -1,8 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="nomeApp">MetreoVC</string>
-    <string name="nome">Introduza o Email</string>
-    <string name="pwd">Introduza a Password</string>
     <string name="registar">Ainda não tem conta? Registar Aqui!</string>
     <string name="login">Login</string>
     <string name="asterisco">*</string>

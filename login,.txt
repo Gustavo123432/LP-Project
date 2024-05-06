@@ -1,0 +1,13 @@
+login,
+ipma, 
+registar,
+localidade,
+-------------
+registar
+passwortd tem de ser maior igual a 6 
+e tem de ser iguais,
+o email tem de conter o @
+
+
+Colocar notificações de tempo se esta a chover ou não (estado do tempo notification)
+

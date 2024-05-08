@@ -8,4 +8,6 @@
     <string name="asterisco">*</string>
     <string name="cPWD">Confirmar Password</string>
     <string name="registarButton">Registar</string>
+    <string name="vento">Vento</string>
+    <string name="precipitacao">Precipitação</string>
 </resources>

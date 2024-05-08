@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful) {
                 saveLogin(email, password)
-                //val intent = Intent(this, RegistarActivity::class.java)
+                val intent = Intent(this, MostraMetreologiaActivity::class.java)
                 startActivity(intent)
             } else {
 

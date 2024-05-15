@@ -8,6 +8,8 @@ passwortd tem de ser maior igual a 6
 e tem de ser iguais,
 o email tem de conter o @
 
+menu e opção de guardar as favoritas e so pode ter 3 favoritas save on database for this user
+
 
 Colocar notificações de tempo se esta a chover ou não (estado do tempo notification)
 

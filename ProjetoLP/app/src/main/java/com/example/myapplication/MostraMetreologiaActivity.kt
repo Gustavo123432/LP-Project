@@ -1,11 +1,14 @@
 package com.example.myapplication
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.SeekBar
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -23,16 +26,24 @@ import com.example.myapplication.models.TempoInformation
 import com.example.myapplication.models.information
 import com.example.myapplication.repository.Repository
 import com.example.myapplication.util.NetworkUtils
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.gson.JsonObject
+import okhttp3.internal.http2.Http2Reader
 import retrofit2.Call
 import retrofit2.Response
+import java.util.logging.Handler
 
 class MostraMetreologiaActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
 
     var districtGlobalIds = mutableMapOf<String, Int>()
     var tempoInfomationn = ArrayList<TempoInformation>()
+
+    private val totalTime = 500
+    private val interval = 100
+    private var elapsedTime = 0
 
     var globalId = ""
     private lateinit var viewModel: MostraMetreologiaActivityViewModel
@@ -50,6 +61,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
 
         testSpinner = findViewById(R.id.spinnerTest)
         recyclerView = findViewById(R.id.recyclerView)
+        progressBar = findViewById(R.id.progressBar)
         getCurrencies()
 
     }
@@ -87,7 +99,12 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 val selectedDistrict = parent?.getItemAtPosition(position).toString()
                                 // Recupere o ID global correspondente do mapa
                                 globalId = districtGlobalIds[selectedDistrict].toString()
+
                                 tempoInfomationn.clear()
+                                val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
+                                recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
+                                recyclerView.adapter = customAdapterTempo
+                                progressBar()
                                 weatherUpdate()
                                 // Faça o que for necessário com o ID global
                                 // Por exemplo, armazene-o em uma variável ou passe-o para outra função
@@ -166,6 +183,25 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                 }
             })
         }
+
+    fun progressBar(){
+
+        val countDownTimer = object : CountDownTimer(totalTime.toLong(), interval.toLong()) {
+            override fun onTick(millisUntilFinished: Long) {
+                progressBar.visibility = View.VISIBLE
+                val progress = ((totalTime - millisUntilFinished).toFloat() / totalTime * 100).toInt()
+                progressBar.progress = progress
+            }
+
+            override fun onFinish() {
+                progressBar.visibility = View.INVISIBLE
+                progressBar.progress = 100
+            }
+        }
+
+        countDownTimer.start()
+    }
+
 }
 
 private fun <E> ArrayList<E>.add(dia: String?, tempoId: String?, temperaturamMinima: String?, temperaturaMaxima: String?, direcaoVento: String?, precipitacao: String?) {

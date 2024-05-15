@@ -45,7 +45,8 @@ class MainActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
-
+        val intent = Intent(this, MostraMetreologiaActivity::class.java)
+        startActivity(intent)
         val savedEmail = sharedPreferences.getString("email", null)
         val savedPassword = sharedPreferences.getString("password", null)
         if (!savedEmail.isNullOrEmpty() && !savedPassword.isNullOrEmpty()) {

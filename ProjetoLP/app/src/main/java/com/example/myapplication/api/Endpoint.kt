@@ -12,6 +12,6 @@ interface Endpoint {
     fun getCurrencies() : Call<JsonObject>
 
     @GET("/open-data/forecast/meteorology/cities/daily/{pais}.json")
-    fun getCurrencyRate(@Path(value = "globalId", encoded = true) globalId : String) : Call<JsonObject>
+    fun getCurrencyRate(@Path(value = "pais", encoded = true) pais: String): Call<JsonObject>
 
 }

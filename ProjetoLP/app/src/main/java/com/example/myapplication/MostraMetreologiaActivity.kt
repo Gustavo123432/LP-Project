@@ -5,24 +5,38 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.api.Endpoint
+import com.example.myapplication.models.MostraMetreolgiaActivityViewModelFactory
+import com.example.myapplication.models.MostraMetreologiaActivityViewModel
+import com.example.myapplication.models.TempoInformation
+import com.example.myapplication.models.information
+import com.example.myapplication.repository.Repository
 import com.example.myapplication.util.NetworkUtils
 import com.google.gson.JsonObject
-import pt.epvc.myapplication.adapters.CustomAdapterTempo
 import retrofit2.Call
 import retrofit2.Response
 
 class MostraMetreologiaActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
     private lateinit var recyclerView: RecyclerView
-    val districtGlobalIds = mutableMapOf<String, Int>()
+
+    var districtGlobalIds = mutableMapOf<String, Int>()
+    var tempoInfomationn = ArrayList<TempoInformation>()
+
     var globalId = ""
+    private lateinit var viewModel: MostraMetreologiaActivityViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +51,6 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         testSpinner = findViewById(R.id.spinnerTest)
         recyclerView = findViewById(R.id.recyclerView)
         getCurrencies()
-        weatherUpdate()
 
     }
     fun getCurrencies (){
@@ -74,6 +87,8 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 val selectedDistrict = parent?.getItemAtPosition(position).toString()
                                 // Recupere o ID global correspondente do mapa
                                 globalId = districtGlobalIds[selectedDistrict].toString()
+                                tempoInfomationn.clear()
+                                weatherUpdate()
                                 // Faça o que for necessário com o ID global
                                 // Por exemplo, armazene-o em uma variável ou passe-o para outra função
                                 Log.d("Selected District", "Name: $selectedDistrict, Global ID: $globalId")
@@ -99,58 +114,61 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         })
     }
 
-    fun weatherUpdate(){
-        val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
-        val endpoint = retrofitClient.create(Endpoint::class.java)
+        fun weatherUpdate() {
 
-        endpoint.getCurrencyRate(globalId).enqueue(object : retrofit2.Callback<JsonObject> {
-            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                if (response.isSuccessful) {
-                    val data = mutableListOf<String>()
-                    val body = response.body()
+            val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
+            val endpoint = retrofitClient.create(Endpoint::class.java)
 
-                    if (body != null) {
-                        val jsonArray = body.getAsJsonArray("data")
+            endpoint.getCurrencyRate(globalId).enqueue(object : retrofit2.Callback<JsonObject> {
+                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                    if (response.isSuccessful) {
+                        val data = mutableListOf<String>()
+                        val body = response.body()
 
-                        jsonArray?.forEach { element ->
-                            val jsonObject = element.asJsonObject
-                            val dataDePrevisao = jsonObject.get("forecastDate").asString
-                            val temperaturaMinima = jsonObject.get("tMin").asString
-                            val temperaturaMaxima = jsonObject.get("tMax").asString
-                            val itensidadeVento = jsonObject.get("classWindSpeed").asString
-                            val direcaoVento = jsonObject.get("predWindDir").asString
-                            val probabilidadePrecipitacao = jsonObject.get("probPrecipita").asString
-                            val idTempo = jsonObject.get("idWeatherType").asString
 
-                            // Preencha o mapa com os nomes dos distritos e seus IDs globais
-                            data.add(dataDePrevisao)
-                            data.add(temperaturaMinima)
-                            data.add(temperaturaMaxima)
-                            data.add(itensidadeVento)
-                            data.add(direcaoVento)
-                            data.add(probabilidadePrecipitacao)
-                            data.add(idTempo)
+                        // criar model to get the data
+                        if (body != null) {
+                            val jsonArray = body.getAsJsonArray("data")
+
+                            jsonArray?.forEach { element ->
+                                val jsonObject = element.asJsonObject
+                                val precipitacao = jsonObject.get("precipitaProb").asString
+                                val temperaturamMinima = jsonObject.get("tMin").asString
+                                val temperaturaMaxima = jsonObject.get("tMax").asString
+                                val direcaoVento = jsonObject.get("predWindDir").asString
+                                val tempoId = jsonObject.get("idWeatherType").asString
+                                val dia = jsonObject.get("forecastDate").asString
+
+                                val information = TempoInformation(dia, tempoId, temperaturamMinima, temperaturaMaxima,direcaoVento, precipitacao)
+                                // Preencha o mapa com os nomes dos distritos e seus IDs globais
+                                tempoInfomationn.add(information)
+
+                            }
+                            //get cod recycler view
+                            val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
+                            recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
+                            recyclerView.adapter = customAdapterTempo
+                           // val adapter = ArrayAdapter(baseContext, CustomAdapterTempo(tempoInfomationn), tempoInfomationn)
+                            //testSpinner.adapter = adapter
+
+
+                        } else {
+                            Log.e("Response Error", "Response body is null")
                         }
-
-                        val adapter = CustomAdapterTempo(data, this@MostraMetreologiaActivity)
-
-                        recyclerView.adapter = adapter
-
-                        // Listener para quando um item é selecionado no spinner
-
                     } else {
-                        Log.e("Response Error", "Response body is null")
+                        Log.e("Response Error", "Unsuccessful response: ${response.code()}")
                     }
-                } else {
-                    Log.e("Response Error", "Unsuccessful response: ${response.code()}")
                 }
-            }
 
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                print("não foi")
+                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                    print("não foi")
 
-            }
-
-        })
-    }
+                }
+            })
+        }
 }
+
+private fun <E> ArrayList<E>.add(dia: String?, tempoId: String?, temperaturamMinima: String?, temperaturaMaxima: String?, direcaoVento: String?, precipitacao: String?) {
+
+}
+

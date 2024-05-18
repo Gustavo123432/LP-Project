@@ -6,32 +6,20 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.SeekBar
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.api.Endpoint
-import com.example.myapplication.models.MostraMetreolgiaActivityViewModelFactory
-import com.example.myapplication.models.MostraMetreologiaActivityViewModel
 import com.example.myapplication.models.TempoInformation
-import com.example.myapplication.models.information
-import com.example.myapplication.repository.Repository
 import com.example.myapplication.util.NetworkUtils
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.gson.JsonObject
-import okhttp3.internal.http2.Http2Reader
 import retrofit2.Call
 import retrofit2.Response
-import java.util.logging.Handler
 
 class MostraMetreologiaActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
@@ -46,7 +34,6 @@ class MostraMetreologiaActivity : AppCompatActivity() {
     private var elapsedTime = 0
 
     var globalId = ""
-    private lateinit var viewModel: MostraMetreologiaActivityViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

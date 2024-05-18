@@ -5,14 +5,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 //import com.bumptech.glide.Glide
-import com.example.myapplication.R
-import com.example.myapplication.models.information
 
 class CustomAdapterTempo(
     private val dataSet: ArrayList<TempoInformation>,
@@ -25,7 +21,7 @@ class CustomAdapterTempo(
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val diaTextView: TextView = view.findViewById(R.id.diaTextView)
-        //val tempoImageView: ImageView = view.findViewById(R.id.tempoImageView)
+        val tempoImageView: ImageView = view.findViewById(R.id.tempoImageView)
         val minTempTextView: TextView = view.findViewById(R.id.minTempTextView)
         val maxTempTextView: TextView = view.findViewById(R.id.maxTempTextView)
         val ventoDirectionTextView: TextView = view.findViewById(R.id.ventoDirectionTextView)
@@ -42,22 +38,80 @@ class CustomAdapterTempo(
         val data = dataSet[position]
 
         viewHolder.diaTextView.text = data.dia
-        //viewHolder.tempoImageView = data.tempoImage
+        imagem(data.tempoImage, viewHolder.tempoImageView)
         viewHolder.minTempTextView.text = data.minTemperatura
         viewHolder.maxTempTextView.text = data.maxTemperatura
         viewHolder.ventoDirectionTextView.text = data.ventoDirection
         viewHolder.precipitacaoTextView.text = data.precipition
 
 
-        /*Glide.with(context)
-            .load(produto.imagem)
-            .into(viewHolder.imageView)*/
-        /*    val diaTextView: TextView = view.findViewById(R.id.diaTextView)
-        val tempoImageView: TextView = view.findViewById(R.id.tempoImageView)
-        val minTempTextView: TextView = view.findViewById(R.id.minTempTextView)
-        val maxTempTextView: ImageView = view.findViewById(R.id.maxTempTextView)
-        val ventoDirectionTextView: TextView = view.findViewById(R.id.ventoDirectionTextView)
-        val precipitacaoTextView: TextView = view.findViewById(R.id.precipitacaoTextView)*/
+    }
+
+    private fun imagem(tempoImage: String, tempoImageView: ImageView) {
+
+        if (tempoImage.equals("1")) {
+            tempoImageView.setImageResource(R.drawable.w_ic_d_01)
+        }else if (tempoImage.equals("2")) {
+            tempoImageView.setImageResource(R.drawable.w_ic_d_02)
+        }else if (tempoImage.equals("3")) {
+            tempoImageView.setImageResource(R.drawable.w_ic_d_03)
+        }else if (tempoImage.equals("4")) {
+            tempoImageView.setImageResource(R.drawable.w_ic_d_04)
+        }else if (tempoImage.equals("5")) {
+            tempoImageView.setImageResource(R.drawable.w_ic_d_05)
+        }else if(tempoImage.equals("6")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_06)
+        }else if(tempoImage.equals("7")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_07)
+        }else  if(tempoImage.equals("8")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_08)
+        }else if(tempoImage.equals("9")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_09)
+        }else if (tempoImage.equals("10")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_10)
+        }else if (tempoImage.equals("11")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_11)
+        }else if (tempoImage.equals("12")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_12)
+        }else if (tempoImage.equals("13")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_13)
+        }else if (tempoImage.equals("14")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_14)
+        }else if (tempoImage.equals("15")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_15)
+        }else if (tempoImage.equals("16")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_16)
+        }else if (tempoImage.equals("17")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_17)
+        }else if (tempoImage.equals("18")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_18)
+        }else if (tempoImage.equals("19")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_19)
+        }else if (tempoImage.equals("20")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_20)
+        }else if (tempoImage.equals("21")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_21)
+        }else if (tempoImage.equals("22")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_22)
+        }else if (tempoImage.equals("23")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_23)
+        }else if (tempoImage.equals("24")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_24)
+        }else if (tempoImage.equals("25")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_25)
+        }else if (tempoImage.equals("26")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_26)
+        }else if (tempoImage.equals("27")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_27)
+        }else if (tempoImage.equals("28")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_28)
+        }else if (tempoImage.equals("29")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_29)
+        }else if (tempoImage.equals("30")){
+            tempoImageView.setImageResource(R.drawable.w_ic_d_30)
+        }
+
+
     }
 
     override fun getItemCount(): Int = dataSet.size

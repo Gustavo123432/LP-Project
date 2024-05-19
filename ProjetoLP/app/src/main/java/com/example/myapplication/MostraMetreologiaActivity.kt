@@ -51,6 +51,9 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         getCurrencies()
 
+        /*aparecer widgets com os 3 locais e o tempo previsto para esse dia, salvar o ultimo local escolhido shared preferences
+        * logout sai da conta fazer o registar activity*/
+
     }
     fun getCurrencies (){
         val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")

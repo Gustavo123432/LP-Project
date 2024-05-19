@@ -2,12 +2,17 @@ package com.example.myapplication
 
 import com.example.myapplication.models.TempoInformation
 import android.content.Context
+import android.icu.text.DecimalFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.math.MathContext
+import java.math.RoundingMode
+import kotlin.math.roundToInt
+
 //import com.bumptech.glide.Glide
 
 class CustomAdapterTempo(
@@ -24,6 +29,7 @@ class CustomAdapterTempo(
         val tempoImageView: ImageView = view.findViewById(R.id.tempoImageView)
         val minTempTextView: TextView = view.findViewById(R.id.minTempTextView)
         val maxTempTextView: TextView = view.findViewById(R.id.maxTempTextView)
+        val ventoImageView: ImageView = view.findViewById(R.id.ventoImageView)
         val ventoDirectionTextView: TextView = view.findViewById(R.id.ventoDirectionTextView)
         val precipitacaoTextView: TextView = view.findViewById(R.id.precipitacaoTextView)
     }
@@ -38,16 +44,38 @@ class CustomAdapterTempo(
         val data = dataSet[position]
 
         viewHolder.diaTextView.text = data.dia
-        imagem(data.tempoImage, viewHolder.tempoImageView)
-        viewHolder.minTempTextView.text = data.minTemperatura
-        viewHolder.maxTempTextView.text = data.maxTemperatura
+        imagemTempo(data.tempoImage, viewHolder.tempoImageView)
+        imagemVento(data.ventoDirection, viewHolder.ventoImageView)
+        viewHolder.minTempTextView.text = data.minTemperatura.toDouble().roundToInt().toString()
+        viewHolder.maxTempTextView.text = data.maxTemperatura.toDouble().roundToInt().toString()
         viewHolder.ventoDirectionTextView.text = data.ventoDirection
         viewHolder.precipitacaoTextView.text = data.precipition
 
 
     }
 
-    private fun imagem(tempoImage: String, tempoImageView: ImageView) {
+    private fun imagemVento(ventoDirection: String, ventoImageView: ImageView) {
+        if (ventoDirection.equals("N")){
+            ventoImageView.setImageResource(R.drawable.n)
+        }else if (ventoDirection.equals("NE")){
+            ventoImageView.setImageResource(R.drawable.ne)
+        }else if (ventoDirection.equals("E")){
+            ventoImageView.setImageResource(R.drawable.e)
+        }else if (ventoDirection.equals("SE")){
+            ventoImageView.setImageResource(R.drawable.se)
+        }else if (ventoDirection.equals("S")){
+            ventoImageView.setImageResource(R.drawable.s)
+        }else if (ventoDirection.equals("SW")){
+            ventoImageView.setImageResource(R.drawable.sw)
+        }else if (ventoDirection.equals("W")){
+            ventoImageView.setImageResource(R.drawable.w)
+        }else if (ventoDirection.equals("NW")){
+            ventoImageView.setImageResource(R.drawable.nw)
+        }
+
+    }
+
+    private fun imagemTempo(tempoImage: String, tempoImageView: ImageView) {
 
         if (tempoImage.equals("1")) {
             tempoImageView.setImageResource(R.drawable.w_ic_d_01)

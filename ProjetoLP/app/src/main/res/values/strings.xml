@@ -10,4 +10,5 @@
     <string name="registarButton">Registar</string>
     <string name="vento">Vento</string>
     <string name="precipitacao">Precipitação</string>
+    <string name="foto">Adicionar Foto</string>
 </resources>

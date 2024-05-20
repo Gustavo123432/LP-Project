@@ -190,6 +190,21 @@ class MostraMetreologiaActivity : AppCompatActivity(), CustomAdapterTempo.Recycl
             })
         }
 
+    /*fun loadAndShowImage() {
+    progressBar.visibility = View.VISIBLE
+    Picasso.get()
+        .load("sua_url_da_imagem")
+        .into(imageView, object : Callback {
+            override fun onSuccess() {
+                progressBar.visibility = View.INVISIBLE
+            }
+
+            override fun onError(e: Exception?) {
+            }
+        })
+}
+*/
+
     fun progressBar(){
 
         val countDownTimer = object : CountDownTimer(totalTime.toLong(), interval.toLong()) {

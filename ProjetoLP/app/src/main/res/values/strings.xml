@@ -10,5 +10,6 @@
     <string name="registarButton">Registar</string>
     <string name="vento">Vento</string>
     <string name="precipitacao">Precipitação</string>
-    <string name="foto">Adicionar Foto</string>
+    <string name="esqPwd">Esqueceu-se da Password? Clique Aqui!</string>
+    <string name="sendEmail">Recuperar Password</string>
 </resources>

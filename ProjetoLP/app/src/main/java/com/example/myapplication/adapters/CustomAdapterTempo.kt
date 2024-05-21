@@ -17,13 +17,14 @@ import kotlin.math.roundToInt
 
 class CustomAdapterTempo(
     private val dataSet: ArrayList<TempoInformation>,
-    //add this for on click
-    private val listener: RecyclerViewEvent
+    private val context: Context,
 ) : RecyclerView.Adapter<CustomAdapterTempo.ViewHolder>() {
 
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
 
-    //no OnClick
-    /*inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val diaTextView: TextView = view.findViewById(R.id.diaTextView)
         val tempoImageView: ImageView = view.findViewById(R.id.tempoImageView)
         val minTempTextView: TextView = view.findViewById(R.id.minTempTextView)
@@ -31,35 +32,12 @@ class CustomAdapterTempo(
         val ventoImageView: ImageView = view.findViewById(R.id.ventoImageView)
         val ventoDirectionTextView: TextView = view.findViewById(R.id.ventoDirectionTextView)
         val precipitacaoTextView: TextView = view.findViewById(R.id.precipitacaoTextView)
-    }*/
-
-    //with OnClick
-    class ViewHolder(view: View, private val listener: RecyclerViewEvent) : RecyclerView.ViewHolder(view), View.OnClickListener {
-        val diaTextView: TextView = view.findViewById(R.id.diaTextView)
-        val tempoImageView: ImageView = view.findViewById(R.id.tempoImageView)
-        val minTempTextView: TextView = view.findViewById(R.id.minTempTextView)
-        val maxTempTextView: TextView = view.findViewById(R.id.maxTempTextView)
-        val ventoImageView: ImageView = view.findViewById(R.id.ventoImageView)
-        val ventoDirectionTextView: TextView = view.findViewById(R.id.ventoDirectionTextView)
-        val precipitacaoTextView: TextView = view.findViewById(R.id.precipitacaoTextView)
-
-        init {
-            view.setOnClickListener(this)
-        }
-
-        override fun onClick(view: View?) {
-            val position = adapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                listener.onItemClick(position)
-            }
-        }
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.tempo, viewGroup, false)
-        //no click return ViewHolder(view)
-        /*click */return ViewHolder(view, listener)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
@@ -160,14 +138,7 @@ class CustomAdapterTempo(
         }else if (tempoImage.equals("30")){
             tempoImageView.setImageResource(R.drawable.w_ic_d_30)
         }
-
-
     }
 
     override fun getItemCount(): Int = dataSet.size
-
-    //add this
-    interface RecyclerViewEvent {
-        fun onItemClick(position: Int)
-    }
 }

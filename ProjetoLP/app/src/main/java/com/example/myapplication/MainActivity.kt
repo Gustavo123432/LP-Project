@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var registarTextVIew : TextView
     private lateinit var asteriscoEmailTextView : TextView
     private lateinit var asteriscoPasswordTextView : TextView
+    private lateinit var esqueceuPwdTextView: TextView
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,15 +43,19 @@ class MainActivity : AppCompatActivity() {
         registarTextVIew = findViewById(R.id.registarTextView)
         asteriscoEmailTextView = findViewById(R.id.asteriscoEmailTextView)
         asteriscoPasswordTextView = findViewById(R.id.asteriscoPasswordTextView)
+        esqueceuPwdTextView = findViewById(R.id.esqPwdTextView)
 
         sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
-        val intent = Intent(this, MostraMetreologiaActivity::class.java)
-        startActivity(intent)
         val savedEmail = sharedPreferences.getString("email", null)
         val savedPassword = sharedPreferences.getString("password", null)
         if (!savedEmail.isNullOrEmpty() && !savedPassword.isNullOrEmpty()) {
             loginUser(savedEmail, savedPassword)
+        }
+
+        esqueceuPwdTextView.setOnClickListener{
+            val intent = Intent(this, EsqueceuPwdActivity::class.java)
+            startActivity(intent)
         }
 
         registarTextVIew.setOnClickListener{

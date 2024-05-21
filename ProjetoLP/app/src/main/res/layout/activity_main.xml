@@ -63,13 +63,13 @@
         android:textColor="#0029C1"
         app:layout_constraintEnd_toEndOf="@+id/passwordEditText"
         app:layout_constraintStart_toStartOf="@+id/passwordEditText"
-        app:layout_constraintTop_toBottomOf="@+id/passwordEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/esqPwdTextView" />
 
     <Button
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="56dp"
         android:hint="@string/login"
         android:text="@string/login"
         app:layout_constraintEnd_toEndOf="@+id/registarTextView"
@@ -99,4 +99,15 @@
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/passwordEditText"
         app:layout_constraintTop_toTopOf="@+id/passwordEditText" />
+
+    <TextView
+        android:id="@+id/esqPwdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/esqPwd"
+        android:textColor="#0029C1"
+        app:layout_constraintEnd_toEndOf="@+id/registarTextView"
+        app:layout_constraintStart_toStartOf="@+id/registarTextView"
+        app:layout_constraintTop_toBottomOf="@+id/passwordEditText" />
 </androidx.constraintlayout.widget.ConstraintLayout>

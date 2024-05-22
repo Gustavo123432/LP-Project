@@ -1,8 +1,12 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -12,6 +16,7 @@ import android.widget.ArrayAdapter
 import android.widget.ProgressBar
 import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.Constraints
 import androidx.core.app.NotificationCompat
@@ -22,26 +27,32 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.api.Endpoint
 import com.example.myapplication.models.TempoInformation
+import com.example.myapplication.notify.NOTIFICATION_CHANNEL_ID
+import com.example.myapplication.notify.NOTIFICATION_ID
+import com.example.myapplication.notify.Notification
+import com.example.myapplication.notify.messageExtra
+import com.example.myapplication.notify.titleExtra
 import com.example.myapplication.util.NetworkUtils
 import com.google.gson.JsonObject
 import retrofit2.Call
 import retrofit2.Response
+import java.util.Calendar
+import java.util.Date
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 class MostraMetreologiaActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
 
+    private var conta = 0
     var districtGlobalIds = mutableMapOf<String, Int>()
     var tempoInfomationn = ArrayList<TempoInformation>()
-
     private val totalTime = 500
     private val interval = 100
     private var elapsedTime = 0
-
     var globalId = ""
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,16 +63,74 @@ class MostraMetreologiaActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         testSpinner = findViewById(R.id.spinnerTest)
         recyclerView = findViewById(R.id.recyclerView)
         progressBar = findViewById(R.id.progressBar)
         getCurrencies()
-
-        /*aparecer widgets com os 3 locais e o tempo previsto para esse dia, salvar o ultimo local escolhido shared preferences
-        * logout sai da conta fazer o registar activity*/
-
     }
+
+    @SuppressLint("ScheduleExactAlarm")
+    private fun scheduleNotification(temperaturaMaxima : String, temperaturamMinima : String) {
+        val temperaturaMaximaa = temperaturaMaxima.toDouble().roundToInt().toString()
+        val temperaturaMinimaa = temperaturamMinima.toDouble().roundToInt().toString()
+        val intent = Intent(applicationContext, Notification::class.java)
+        val title = "Notificação de Temperatura"
+        val message = "A Temperatura Minima é de " + temperaturaMinimaa + "º e a Temperatura Máxima é de " + temperaturaMaximaa+"º"
+        intent.putExtra(titleExtra, title)
+        intent.putExtra(messageExtra, message)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val time = getTime()
+        alarmManager.setExactAndAllowWhileIdle(
+
+            AlarmManager.RTC_WAKEUP,
+            time,
+            pendingIntent
+        )
+        showAlert(time, title, message)
+    }
+
+    private fun showAlert(time: Long, title: String, message: String) {
+        val date = Date(time)
+        val dateFormat = android.text.format.DateFormat.getLongDateFormat(applicationContext)
+        val timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext)
+
+        AlertDialog.Builder(this)
+            .setTitle("Notification Sheduled")
+            .setMessage("Title: " + title
+                    + "\nMessage: " + message
+                    + "\nAt: " + dateFormat.format(date) + " " + timeFormat.format(date))
+            .setPositiveButton("Okay"){_,_ ->}
+            .show()
+    }
+
+    private fun getTime(): Long {
+        val minute = "37"
+        val hour = "22"
+
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, hour.toInt())
+        calendar.set(Calendar.MINUTE, minute.toInt())
+        return calendar.timeInMillis
+    }
+
+    @SuppressLint("NewApi")
+    private fun createNotificationChannel() {
+        val name = "Notification Channel"
+        val desc = "A Description of the Channel"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance)
+        channel.description = desc
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
     fun getCurrencies (){
         val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
         val endpoint = retrofitClient.create(Endpoint::class.java)
@@ -109,7 +178,6 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                             }
 
                             override fun onNothingSelected(parent: AdapterView<*>?) {
-                                // Não faz nada quando nada é selecionado
                             }
                         }
                     } else {
@@ -139,8 +207,6 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                         val data = mutableListOf<String>()
                         val body = response.body()
 
-
-                        // criar model to get the data
                         if (body != null) {
                             val jsonArray = body.getAsJsonArray("data")
 
@@ -156,15 +222,15 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 val information = TempoInformation(dia, tempoId, temperaturamMinima, temperaturaMaxima,direcaoVento, precipitacao)
                                 // Preencha o mapa com os nomes dos distritos e seus IDs globais
                                 tempoInfomationn.add(information)
+                                if(conta == 0){
+                                    createNotificationChannel()
+                                    scheduleNotification(temperaturaMaxima, temperaturamMinima)
+                                    conta = 1
+                                }
                             }
-                            //get cod recycler view
                             val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
                             recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
                             recyclerView.adapter = customAdapterTempo
-                           // val adapter = ArrayAdapter(baseContext, CustomAdapterTempo(tempoInfomationn), tempoInfomationn)
-                            //testSpinner.adapter = adapter
-
-
                         } else {
                             Log.e("Response Error", "Response body is null")
                         }
@@ -179,7 +245,6 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                 }
             })
         }
-
     fun progressBar(){
 
         val countDownTimer = object : CountDownTimer(totalTime.toLong(), interval.toLong()) {

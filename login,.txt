@@ -13,3 +13,9 @@ menu e opção de guardar as favoritas e so pode ter 3 favoritas save on databas
 
 Colocar notificações de tempo se esta a chover ou não (estado do tempo notification)
 
+/*aparecer widgets com os 3 locais e o tempo previsto para esse dia, salvar o ultimo local escolhido shared preferences
+        * logout sai da conta fazer o registar activity*/
+
+        //criar defenicoes de saber o tempo
+
+

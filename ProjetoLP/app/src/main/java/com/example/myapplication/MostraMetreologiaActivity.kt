@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -26,6 +27,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.api.Endpoint
+import com.example.myapplication.definicoes.DefinicoesActivity
 import com.example.myapplication.models.TempoInformation
 import com.example.myapplication.notify.NOTIFICATION_CHANNEL_ID
 import com.example.myapplication.notify.NOTIFICATION_ID
@@ -33,6 +35,8 @@ import com.example.myapplication.notify.Notification
 import com.example.myapplication.notify.messageExtra
 import com.example.myapplication.notify.titleExtra
 import com.example.myapplication.util.NetworkUtils
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.JsonObject
 import retrofit2.Call
 import retrofit2.Response
@@ -45,6 +49,8 @@ class MostraMetreologiaActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
+    private lateinit var bottomNavigationView: BottomNavigationView
+    private  lateinit var sharedPreferences: SharedPreferences
 
     private var conta = 0
     var districtGlobalIds = mutableMapOf<String, Int>()
@@ -66,8 +72,40 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         testSpinner = findViewById(R.id.spinnerTest)
         recyclerView = findViewById(R.id.recyclerView)
         progressBar = findViewById(R.id.progressBar)
+        bottomNavigationView = findViewById(R.id.bottomNavigationView)
         getCurrencies()
+
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.homeFragment -> {
+                    val intent = Intent(this, MostraMetreologiaActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.profileFragment -> {
+                    /*val intent = Intent(this, ProfileActivity::class.java)
+                    startActivity(intent)*/
+                    true
+                }
+                R.id.settings -> {
+                    val intent = Intent(this, DefinicoesActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.logout -> {
+                    sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().clear().apply()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                else -> false
+            }
+        }
     }
+
+
+
 
     @SuppressLint("ScheduleExactAlarm")
     private fun scheduleNotification(temperaturaMaxima : String, temperaturamMinima : String) {
@@ -172,6 +210,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 recyclerView.adapter = customAdapterTempo
                                 progressBar()
                                 weatherUpdate()
+                                conta == 0
                                 // Faça o que for necessário com o ID global
                                 // Por exemplo, armazene-o em uma variável ou passe-o para outra função
                                 Log.d("Selected District", "Name: $selectedDistrict, Global ID: $globalId")

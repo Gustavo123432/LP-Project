@@ -12,4 +12,6 @@
     <string name="precipitacao">Precipitação</string>
     <string name="esqPwd">Esqueceu-se da Password? Clique Aqui!</string>
     <string name="sendEmail">Recuperar Password</string>
+    <string name="definicoes">Definições</string>
+    <string name="notify">    Notificações</string>
 </resources>

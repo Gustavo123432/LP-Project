@@ -6,4 +6,6 @@
     <string name="cPWD">Confirmar Password</string>
     <string name="registarButton">Registar</string>
     <string name="sendEmail">Recuperar Password</string>
+    <string name="definicoes">Definições</string>
+    <string name="notify">Notificações</string>
 </resources>

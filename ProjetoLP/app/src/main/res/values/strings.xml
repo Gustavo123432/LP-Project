@@ -14,4 +14,6 @@
     <string name="sendEmail">Recuperar Password</string>
     <string name="definicoes">Definições</string>
     <string name="notify">    Notificações</string>
+    <string name="opcao">Selecione uma Opção:</string>
+    <string name="saveChanges">Guardar Alterações</string>
 </resources>

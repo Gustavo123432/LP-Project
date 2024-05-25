@@ -105,15 +105,13 @@ class MostraMetreologiaActivity : AppCompatActivity() {
     }
 
 
-
-
     @SuppressLint("ScheduleExactAlarm")
-    private fun scheduleNotification(temperaturaMaxima : String, temperaturamMinima : String) {
+    private fun scheduleNotification(temperaturaMaxima: String, temperaturamMinima: String) {
         val temperaturaMaximaa = temperaturaMaxima.toDouble().roundToInt().toString()
         val temperaturaMinimaa = temperaturamMinima.toDouble().roundToInt().toString()
         val intent = Intent(applicationContext, Notification::class.java)
         val title = "Notificação de Temperatura"
-        val message = "A Temperatura Minima é de " + temperaturaMinimaa + "º e a Temperatura Máxima é de " + temperaturaMaximaa+"º"
+        val message = "A Temp. Minima é de " + temperaturaMinimaa + "º e a Temp. Máxima é de " + temperaturaMaximaa + "º"
         intent.putExtra(titleExtra, title)
         intent.putExtra(messageExtra, message)
 
@@ -123,14 +121,18 @@ class MostraMetreologiaActivity : AppCompatActivity() {
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val time = getTime()
-        alarmManager.setExactAndAllowWhileIdle(
 
+        // Agendar notificação repetitiva todos os dias às 7:30
+        alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
             time,
+            AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
+
         showAlert(time, title, message)
     }
 
@@ -140,21 +142,32 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         val timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext)
 
         AlertDialog.Builder(this)
-            .setTitle("Notification Sheduled")
+            .setTitle("Notification Scheduled")
             .setMessage("Title: " + title
                     + "\nMessage: " + message
                     + "\nAt: " + dateFormat.format(date) + " " + timeFormat.format(date))
-            .setPositiveButton("Okay"){_,_ ->}
+            .setPositiveButton("Okay") { _, _ -> }
             .show()
     }
 
     private fun getTime(): Long {
-        val minute = "37"
-        val hour = "22"
+
+        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val dia = sharedPreferences.getString("diaSemana", null)
+        val hour = sharedPreferences.getInt("hour", 7)
+        val minute = sharedPreferences.getInt("minute", 30)
 
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, hour.toInt())
-        calendar.set(Calendar.MINUTE, minute.toInt())
+        calendar.set(Calendar.HOUR_OF_DAY, hour)
+        calendar.set(Calendar.MINUTE, minute)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        // Se a hora atual for depois das 7:30 de hoje, agendar para amanhã
+        if (calendar.timeInMillis < System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
         return calendar.timeInMillis
     }
 
@@ -192,9 +205,16 @@ class MostraMetreologiaActivity : AppCompatActivity() {
 
                             data.add(districtName)
                         }
+                        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                        val distrito = sharedPreferences.getString("distrito", null)
+                        val position = sharedPreferences.getInt("position", 0)
+                            val adapter = ArrayAdapter(baseContext, android.R.layout.simple_spinner_dropdown_item, data)
+                            testSpinner.adapter = adapter
+                        if(distrito != null){
+                            testSpinner.setSelection(position)
+                        }
 
-                        val adapter = ArrayAdapter(baseContext, android.R.layout.simple_spinner_dropdown_item, data)
-                        testSpinner.adapter = adapter
+
 
                         // Listener para quando um item é selecionado no spinner
                         testSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -203,6 +223,11 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 val selectedDistrict = parent?.getItemAtPosition(position).toString()
                                 // Recupere o ID global correspondente do mapa
                                 globalId = districtGlobalIds[selectedDistrict].toString()
+                                sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                                val editor = sharedPreferences.edit()
+                                editor.putString("distrito", selectedDistrict)
+                                editor.putInt("position", position)
+                                editor.apply()
 
                                 tempoInfomationn.clear()
                                 val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)

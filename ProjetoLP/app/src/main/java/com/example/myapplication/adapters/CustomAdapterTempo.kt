@@ -3,12 +3,14 @@ package com.example.myapplication
 import com.example.myapplication.models.TempoInformation
 import android.content.Context
 import android.icu.text.DecimalFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.models.UvInformation
 import java.math.MathContext
 import java.math.RoundingMode
 import kotlin.math.roundToInt
@@ -17,6 +19,8 @@ import kotlin.math.roundToInt
 
 class CustomAdapterTempo(
     private val dataSet: ArrayList<TempoInformation>,
+    private val dataUV: ArrayList<UvInformation>,
+    private val globalIdSelecionado: String,
     private val context: Context,
 ) : RecyclerView.Adapter<CustomAdapterTempo.ViewHolder>() {
 
@@ -32,6 +36,7 @@ class CustomAdapterTempo(
         val ventoImageView: ImageView = view.findViewById(R.id.ventoImageView)
         val ventoDirectionTextView: TextView = view.findViewById(R.id.ventoDirectionTextView)
         val precipitacaoTextView: TextView = view.findViewById(R.id.precipitacaoTextView)
+        val uvImageView: ImageView = view.findViewById(R.id.uvImageView)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -42,6 +47,7 @@ class CustomAdapterTempo(
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val data = dataSet[position]
+        val dataUV = dataUV[position]
 
         viewHolder.diaTextView.text = data.dia
         imagemTempo(data.tempoImage, viewHolder.tempoImageView)
@@ -50,6 +56,17 @@ class CustomAdapterTempo(
         viewHolder.maxTempTextView.text = data.maxTemperatura.toDouble().roundToInt().toString()
         viewHolder.ventoDirectionTextView.text = data.ventoDirection
         viewHolder.precipitacaoTextView.text = data.precipition
+        imagemUV(dataUV.globalIdLocal, dataUV.iUv, dataUV.data, globalIdSelecionado)
+
+
+
+    }
+
+    private fun imagemUV(globalIdLocal: String, iUV: String, data:String, idLocalSelecionado:String) {
+        Log.e("local", globalIdLocal)
+        Log.e("iuv", iUV)
+        Log.e("data", data)
+        Log.e("Response Error", idLocalSelecionado)
 
 
     }

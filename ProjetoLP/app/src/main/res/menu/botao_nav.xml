@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/homeFragment"
-        android:title="Home"
-        android:icon="@mipmap/circle" />
+        android:title="Tempo"
+        android:icon="@mipmap/sun" />
     <item
         android:id="@+id/profileFragment"
-        android:title="Perfil"
-        android:icon="@mipmap/account" />
+        android:title="Mar"
+        android:icon="@mipmap/ondas" />
     <item
     android:id="@+id/settings"
     android:title="Definições"

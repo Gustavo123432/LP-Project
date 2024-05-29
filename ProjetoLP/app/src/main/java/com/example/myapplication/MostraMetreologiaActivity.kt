@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.api.Endpoint
 import com.example.myapplication.definicoes.DefinicoesActivity
 import com.example.myapplication.models.TempoInformation
+import com.example.myapplication.models.UvInformation
 import com.example.myapplication.notify.NOTIFICATION_CHANNEL_ID
 import com.example.myapplication.notify.NOTIFICATION_ID
 import com.example.myapplication.notify.Notification
@@ -37,9 +38,12 @@ import com.example.myapplication.notify.titleExtra
 import com.example.myapplication.util.NetworkUtils
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import retrofit2.Call
 import retrofit2.Response
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -55,11 +59,14 @@ class MostraMetreologiaActivity : AppCompatActivity() {
     private var conta = 0
     var districtGlobalIds = mutableMapOf<String, Int>()
     var tempoInfomationn = ArrayList<TempoInformation>()
+    var uvInformation = ArrayList<UvInformation>()
+
     private val totalTime = 500
     private val interval = 100
     private var elapsedTime = 0
     var globalId = ""
 
+    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -74,6 +81,15 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
         getCurrencies()
+
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val today = LocalDate.now()
+        val tomorrow = today.plusDays(1)
+        val dayAfterTomorrow = today.plusDays(2)
+
+        val todayFormatted = today.format(dateFormatter)
+        val tomorrowFormatted = tomorrow.format(dateFormatter)
+        val dayAfterTomorrowFormatted = dayAfterTomorrow.format(dateFormatter)
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -111,7 +127,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         val temperaturaMinimaa = temperaturamMinima.toDouble().roundToInt().toString()
         val intent = Intent(applicationContext, Notification::class.java)
         val title = "Notificação de Temperatura"
-        val message = "A Temp. Minima é de " + temperaturaMinimaa + "º e a Temp. Máxima é de " + temperaturaMaximaa + "º"
+        val message = "A Temp. Minima é de " + temperaturaMinimaa + "º \nTemp. Máxima é de " + temperaturaMaximaa + "º"
         intent.putExtra(titleExtra, title)
         intent.putExtra(messageExtra, message)
 
@@ -230,9 +246,9 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 editor.apply()
 
                                 tempoInfomationn.clear()
-                                val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
+                                /*val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
                                 recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
-                                recyclerView.adapter = customAdapterTempo
+                                recyclerView.adapter = customAdapterTempo*/
                                 progressBar()
                                 weatherUpdate()
                                 conta == 0
@@ -291,10 +307,8 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                     scheduleNotification(temperaturaMaxima, temperaturamMinima)
                                     conta = 1
                                 }
+                                uvUpdate()
                             }
-                            val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
-                            recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
-                            recyclerView.adapter = customAdapterTempo
                         } else {
                             Log.e("Response Error", "Response body is null")
                         }
@@ -304,6 +318,48 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                    print("não foi")
+
+                }
+            })
+        }
+
+        fun uvUpdate(){
+            val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
+            val endpoint = retrofitClient.create(Endpoint::class.java)
+
+            endpoint.getUv().enqueue(object : retrofit2.Callback<JsonArray> {
+                override fun onResponse(call: Call<JsonArray>, response: Response<JsonArray>) {
+                    if (response.isSuccessful) {
+                        val data = mutableListOf<String>()
+                        val body = response.body()
+
+                        if (body != null) {
+                            val jsonArray = body.getAsJsonArray()
+
+                            jsonArray?.forEach { element ->
+                                val jsonObject = element.asJsonObject
+                                val globalIdLocal = jsonObject.get("globalIdLocal").asString
+                                val iUv = jsonObject.get("iUv").asString
+                                val data = jsonObject.get("data").asString
+
+                                val information = UvInformation(globalIdLocal, iUv, data)
+                                // Preencha o mapa com os nomes dos distritos e seus IDs globais
+                                uvInformation.add(information)
+                            }
+                            val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, uvInformation, globalId, this@MostraMetreologiaActivity)
+                            recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
+                            recyclerView.adapter = customAdapterTempo
+
+                        } else {
+                            Log.e("Response Error", "Response body is null")
+                        }
+                    } else {
+                        Log.e("Response Error", "Unsuccessful response: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<JsonArray>, t: Throwable) {
                     print("não foi")
 
                 }

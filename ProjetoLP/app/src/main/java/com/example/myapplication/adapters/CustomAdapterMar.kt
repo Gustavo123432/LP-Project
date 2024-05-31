@@ -17,12 +17,12 @@ import kotlin.math.roundToInt
 
 //import com.bumptech.glide.Glide
 
-class CustomAdapterTempo(
+class CustomAdapterMar(
     private val dataSet: ArrayList<TempoInformation>,
     private val dataUV: ArrayList<UvInformation>,
     private val globalIdSelecionado: String,
     private val context: Context,
-) : RecyclerView.Adapter<CustomAdapterTempo.ViewHolder>() {
+) : RecyclerView.Adapter<CustomAdapterMar.ViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)

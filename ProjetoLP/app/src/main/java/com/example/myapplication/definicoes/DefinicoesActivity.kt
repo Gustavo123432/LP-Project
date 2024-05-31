@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myapplication.MainActivity
+import com.example.myapplication.MarActivity
 import com.example.myapplication.MostraMetreologiaActivity
 import com.example.myapplication.R
+import com.example.myapplication.databinding.ActivityMostraMetreologiaBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class DefinicoesActivity : AppCompatActivity() {
@@ -40,14 +42,14 @@ class DefinicoesActivity : AppCompatActivity() {
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.homeFragment -> {
+                R.id.tempo -> {
                     val intent = Intent(this, MostraMetreologiaActivity::class.java)
                     startActivity(intent)
                     true
                 }
-                R.id.profileFragment -> {
-                    /*val intent = Intent(this, ProfileActivity::class.java)
-                    startActivity(intent)*/
+                R.id.mar -> {
+                    val intent = Intent(this, MarActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.settings -> {

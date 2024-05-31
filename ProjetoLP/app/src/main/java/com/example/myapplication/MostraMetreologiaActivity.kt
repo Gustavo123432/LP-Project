@@ -93,14 +93,14 @@ class MostraMetreologiaActivity : AppCompatActivity() {
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.homeFragment -> {
+                R.id.tempo -> {
                     val intent = Intent(this, MostraMetreologiaActivity::class.java)
                     startActivity(intent)
                     true
                 }
-                R.id.profileFragment -> {
-                    /*val intent = Intent(this, ProfileActivity::class.java)
-                    startActivity(intent)*/
+                R.id.mar -> {
+                    val intent = Intent(this, MarActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.settings -> {

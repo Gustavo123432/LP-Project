@@ -10,4 +10,14 @@
     <string name="notify">Notificações</string>
     <string name="opcao">Selecione uma Opção</string>
     <string name="saveChanges">Guardar Alterações</string>
+    <string name="periodoMinimoOnda">Periodo Minimo da Onda</string>
+    <string name="periodoMaximoOnda">Periodo Máximo da Onda</string>
+    <string name="marMinimoTotal">Altura Mar Minima</string>
+    <string name="marMaximoTotal">Altura Máxima Mar</string>
+    <string name="ondulacaoMinM">Ondulação Minima</string>
+    <string name="metros">(m)</string>
+    <string name="ondulacaoMax">Ondulação Máxima</string>
+    <string name="temperaturaMaxima">Temperatura Máxima Mar</string>
+    <string name="temperaturaMinima">Temperatura Minima Mar</string>
+    <string name="direcaoOnda">Direção Onda</string>
 </resources>

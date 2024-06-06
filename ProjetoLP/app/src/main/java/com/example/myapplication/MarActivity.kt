@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.health.connect.datatypes.Vo2MaxRecord
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -14,8 +15,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.api.Endpoint
+import com.example.myapplication.models.MarInformation
 import com.example.myapplication.models.TempoInformation
 import com.example.myapplication.models.UvInformation
 import com.example.myapplication.util.NetworkUtils
@@ -27,14 +30,18 @@ import retrofit2.Response
 
 class MarActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var marRecyclerView: RecyclerView
+    private lateinit var mar1RecyclerView: RecyclerView
+    private lateinit var mar2RecyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var bottomNavigationView: BottomNavigationView
     private  lateinit var sharedPreferences: SharedPreferences
 
     private var conta = 0
+    private var contador = 0
     var districtGlobalIds = mutableMapOf<String, Int>()
     var tempoInfomationn = ArrayList<TempoInformation>()
+    var marInformation = ArrayList<MarInformation>()
     var uvInformation = ArrayList<UvInformation>()
 
     private val totalTime = 500
@@ -51,7 +58,9 @@ class MarActivity : AppCompatActivity() {
             insets
         }
         testSpinner = findViewById(R.id.localMarSpinner)
-        recyclerView = findViewById(R.id.marRecyclerView)
+        marRecyclerView = findViewById(R.id.marRecyclerView)
+        mar1RecyclerView = findViewById(R.id.mar1recyclerView)
+        mar2RecyclerView = findViewById(R.id.mar2recyclerView)
 //        bottomNavigationView = findViewById(R.id.bottomNavigationView)
         getCurrencies()
 
@@ -218,12 +227,12 @@ class MarActivity : AppCompatActivity() {
                                     editor.putInt("posicaoRegiaoCusteira", position)
                                     editor.apply()
 
-                                    tempoInfomationn.clear()
+                                    marInformation.clear()
                                     /*val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
                                     recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
                                     recyclerView.adapter = customAdapterTempo*/
                                     //progressBar()
-                                    waveUpdate()
+                                    waveDay0()
                                     conta == 0
                                     // Faça o que for necessário com o ID global
                                     // Por exemplo, armazene-o em uma variável ou passe-o para outra função
@@ -249,12 +258,12 @@ class MarActivity : AppCompatActivity() {
             })
         }
 
-       fun waveUpdate() {
+       fun waveDay0() {
 
             val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
             val endpoint = retrofitClient.create(Endpoint::class.java)
 
-            endpoint.getDay0Wave(globalId).enqueue(object : retrofit2.Callback<JsonObject> {
+            endpoint.getDay0Wave().enqueue(object : retrofit2.Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                     if (response.isSuccessful) {
                         val data = mutableListOf<String>()
@@ -265,23 +274,29 @@ class MarActivity : AppCompatActivity() {
 
                             jsonArray?.forEach { element ->
                                 val jsonObject = element.asJsonObject
-                                val precipitacao = jsonObject.get("wavePeriodMin").asString
-                                val temperaturamMinima = jsonObject.get("tMin").asString
-                                val temperaturaMaxima = jsonObject.get("tMax").asString
-                                val direcaoVento = jsonObject.get("predWindDir").asString
-                                val tempoId = jsonObject.get("idWeatherType").asString
-                                val dia = jsonObject.get("forecastDate").asString
+                                val globalIdLocal = jsonObject.get("globalIdLocal").asString
+                                val periodoMinimoOnda = jsonObject.get("wavePeriodMin").asString
+                                val marTotalMaximo = jsonObject.get("totalSeaMax").asString
+                                val ondulacaoMax = jsonObject.get("waveHighMax").asString
+                                val ondulacaoMin = jsonObject.get("waveHighMin").asString
+                                val periodoMaximoOnda = jsonObject.get("wavePeriodMax").asString
+                                val temperaturaMaximaMar = jsonObject.get("sstMax").asString
+                                val marTotalMinimo = jsonObject.get("totalSeaMin").asString
+                                val direcaoOnda = jsonObject.get("predWaveDir").asString
+                                val temperaturaMinimaMar = jsonObject.get("sstMin").asString
 
-                                val information = TempoInformation(dia, tempoId, temperaturamMinima, temperaturaMaxima,direcaoVento, precipitacao)
+
+                                val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
                                 // Preencha o mapa com os nomes dos distritos e seus IDs globais
-                                tempoInfomationn.add(information)
-                                if(conta == 0){
-                                    createNotificationChannel()
-                                    scheduleNotification(temperaturaMaxima, temperaturamMinima)
-                                    conta = 1
-                                }
-                                uvUpdate()
-                            }
+                                marInformation.add(information)
+                                if(contador == 0){
+                                    val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
+                                    marRecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
+                                    marRecyclerView.adapter = customAdapterMar
+                                    marInformation.clear()
+                                    waveDay1()
+                                    contador = 1
+                                } }
                         } else {
                             Log.e("Response Error", "Response body is null")
                         }
@@ -297,7 +312,115 @@ class MarActivity : AppCompatActivity() {
             })
         }
 
-        fun uvUpdate(){
+    fun waveDay1() {
+
+        val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
+        val endpoint = retrofitClient.create(Endpoint::class.java)
+
+        endpoint.getDay1Wave().enqueue(object : retrofit2.Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val data = mutableListOf<String>()
+                    val body = response.body()
+
+                    if (body != null) {
+                        val jsonArray = body.getAsJsonArray("data")
+
+                        jsonArray?.forEach { element ->
+                            val jsonObject = element.asJsonObject
+                            val globalIdLocal = jsonObject.get("globalIdLocal").asString
+                            val periodoMinimoOnda = jsonObject.get("wavePeriodMin").asString
+                            val marTotalMaximo = jsonObject.get("totalSeaMax").asString
+                            val ondulacaoMax = jsonObject.get("waveHighMax").asString
+                            val ondulacaoMin = jsonObject.get("waveHighMin").asString
+                            val periodoMaximoOnda = jsonObject.get("wavePeriodMax").asString
+                            val temperaturaMaximaMar = jsonObject.get("sstMax").asString
+                            val marTotalMinimo = jsonObject.get("totalSeaMin").asString
+                            val direcaoOnda = jsonObject.get("predWaveDir").asString
+                            val temperaturaMinimaMar = jsonObject.get("sstMin").asString
+
+
+                            val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
+                            // Preencha o mapa com os nomes dos distritos e seus IDs globais
+                            marInformation.add(information)
+                            if(contador == 1){
+                                val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
+                                mar1RecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
+                                mar1RecyclerView.adapter = customAdapterMar
+                                marInformation.clear()
+                                waveDay2()
+                                contador = 2
+                            }
+                        }
+                    } else {
+                        Log.e("Response Error", "Response body is null")
+                    }
+                } else {
+                    Log.e("Response Error", "Unsuccessful response: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                print("não foi")
+
+            }
+        })
+    }
+    fun waveDay2() {
+
+        val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
+        val endpoint = retrofitClient.create(Endpoint::class.java)
+
+        endpoint.getDay2Wave().enqueue(object : retrofit2.Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val data = mutableListOf<String>()
+                    val body = response.body()
+
+                    if (body != null) {
+                        val jsonArray = body.getAsJsonArray("data")
+
+                        jsonArray?.forEach { element ->
+                            val jsonObject = element.asJsonObject
+                            val globalIdLocal = jsonObject.get("globalIdLocal").asString
+                            val periodoMinimoOnda = jsonObject.get("wavePeriodMin").asString
+                            val marTotalMaximo = jsonObject.get("totalSeaMax").asString
+                            val ondulacaoMax = jsonObject.get("waveHighMax").asString
+                            val ondulacaoMin = jsonObject.get("waveHighMin").asString
+                            val periodoMaximoOnda = jsonObject.get("wavePeriodMax").asString
+                            val temperaturaMaximaMar = jsonObject.get("sstMax").asString
+                            val marTotalMinimo = jsonObject.get("totalSeaMin").asString
+                            val direcaoOnda = jsonObject.get("predWaveDir").asString
+                            val temperaturaMinimaMar = jsonObject.get("sstMin").asString
+
+
+                            val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
+                            // Preencha o mapa com os nomes dos distritos e seus IDs globais
+                            marInformation.add(information)
+                            if(contador == 2){
+                                val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
+                                mar2RecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
+                                mar2RecyclerView.adapter = customAdapterMar
+
+                                contador = 2
+                            }
+                        }
+                    } else {
+                        Log.e("Response Error", "Response body is null")
+                    }
+                } else {
+                    Log.e("Response Error", "Unsuccessful response: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                print("não foi")
+
+            }
+        })
+    }
+
+       /* fun uvUpdate(){
             val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
             val endpoint = retrofitClient.create(Endpoint::class.java)
 
@@ -320,9 +443,9 @@ class MarActivity : AppCompatActivity() {
                                 // Preencha o mapa com os nomes dos distritos e seus IDs globais
                                 uvInformation.add(information)
                             }
-                            val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, uvInformation, globalId, this@MostraMetreologiaActivity)
-                            recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
-                            recyclerView.adapter = customAdapterTempo
+                            val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
+                            recyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
+                            recyclerView.adapter = customAdapterMar
 
                         } else {
                             Log.e("Response Error", "Response body is null")

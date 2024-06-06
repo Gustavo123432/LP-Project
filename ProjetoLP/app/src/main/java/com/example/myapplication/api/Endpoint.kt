@@ -22,13 +22,13 @@ interface Endpoint {
     fun getSeaLocation() : Call<JsonArray>
 
     @GET("/open-data/forecast/oceanography/daily/hp-daily-sea-forecast-day0.json")
-    fun getDay0Wave(@Path(value = "local", encoded = true) local: String): Call<JsonObject>
+    fun getDay0Wave(): Call<JsonObject>
 
     @GET("/open-data/forecast/oceanography/daily/hp-daily-sea-forecast-day1.json")
-    fun getDay1Wave(@Path(value = "local", encoded = true) local: String): Call<JsonObject>
+    fun getDay1Wave(): Call<JsonObject>
 
     @GET("/open-data/forecast/oceanography/daily/hp-daily-sea-forecast-day2.json")
-    fun getDay2Wave(@Path(value = "local", encoded = true) local: String): Call<JsonObject>
+    fun getDay2Wave(): Call<JsonObject>
 
 
 }

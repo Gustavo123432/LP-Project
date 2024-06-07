@@ -31,8 +31,6 @@ import retrofit2.Response
 class MarActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
     private lateinit var marRecyclerView: RecyclerView
-    private lateinit var mar1RecyclerView: RecyclerView
-    private lateinit var mar2RecyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var bottomNavigationView: BottomNavigationView
     private  lateinit var sharedPreferences: SharedPreferences
@@ -42,6 +40,8 @@ class MarActivity : AppCompatActivity() {
     var districtGlobalIds = mutableMapOf<String, Int>()
     var tempoInfomationn = ArrayList<TempoInformation>()
     var marInformation = ArrayList<MarInformation>()
+    var mar1Information = ArrayList<MarInformation>()
+    var mar2Information = ArrayList<MarInformation>()
     var uvInformation = ArrayList<UvInformation>()
 
     private val totalTime = 500
@@ -59,8 +59,6 @@ class MarActivity : AppCompatActivity() {
         }
         testSpinner = findViewById(R.id.localMarSpinner)
         marRecyclerView = findViewById(R.id.marRecyclerView)
-        mar1RecyclerView = findViewById(R.id.mar1recyclerView)
-        mar2RecyclerView = findViewById(R.id.mar2recyclerView)
 //        bottomNavigationView = findViewById(R.id.bottomNavigationView)
         getCurrencies()
 
@@ -228,9 +226,11 @@ class MarActivity : AppCompatActivity() {
                                     editor.apply()
 
                                     marInformation.clear()
-                                    /*val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
-                                    recyclerView.layoutManager = LinearLayoutManager(this@MostraMetreologiaActivity, LinearLayoutManager.HORIZONTAL, false)
-                                    recyclerView.adapter = customAdapterTempo*/
+                                    mar1Information.clear()
+                                    mar2Information.clear()
+                                  /*  val customAdapterTempo = CustomAdapterMar(marInformation, mar1Information, mar2Information, globalId, this@MarActivity)
+                                    marRecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
+                                    marRecyclerView.adapter = customAdapterTempo*/
                                     //progressBar()
                                     waveDay0()
                                     conta == 0
@@ -276,12 +276,12 @@ class MarActivity : AppCompatActivity() {
                                 val jsonObject = element.asJsonObject
                                 val globalIdLocal = jsonObject.get("globalIdLocal").asString
                                 val periodoMinimoOnda = jsonObject.get("wavePeriodMin").asString
-                                val marTotalMaximo = jsonObject.get("totalSeaMax").asString
+                                val marTotalMaximo = jsonObject.get("totalSeaMax").asDouble
                                 val ondulacaoMax = jsonObject.get("waveHighMax").asString
                                 val ondulacaoMin = jsonObject.get("waveHighMin").asString
                                 val periodoMaximoOnda = jsonObject.get("wavePeriodMax").asString
                                 val temperaturaMaximaMar = jsonObject.get("sstMax").asString
-                                val marTotalMinimo = jsonObject.get("totalSeaMin").asString
+                                val marTotalMinimo = jsonObject.get("totalSeaMin").asDouble
                                 val direcaoOnda = jsonObject.get("predWaveDir").asString
                                 val temperaturaMinimaMar = jsonObject.get("sstMin").asString
 
@@ -290,10 +290,6 @@ class MarActivity : AppCompatActivity() {
                                 // Preencha o mapa com os nomes dos distritos e seus IDs globais
                                 marInformation.add(information)
                                 if(contador == 0){
-                                    val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
-                                    marRecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
-                                    marRecyclerView.adapter = customAdapterMar
-                                    marInformation.clear()
                                     waveDay1()
                                     contador = 1
                                 } }
@@ -330,24 +326,20 @@ class MarActivity : AppCompatActivity() {
                             val jsonObject = element.asJsonObject
                             val globalIdLocal = jsonObject.get("globalIdLocal").asString
                             val periodoMinimoOnda = jsonObject.get("wavePeriodMin").asString
-                            val marTotalMaximo = jsonObject.get("totalSeaMax").asString
+                            val marTotalMaximo = jsonObject.get("totalSeaMax").asDouble
                             val ondulacaoMax = jsonObject.get("waveHighMax").asString
                             val ondulacaoMin = jsonObject.get("waveHighMin").asString
                             val periodoMaximoOnda = jsonObject.get("wavePeriodMax").asString
                             val temperaturaMaximaMar = jsonObject.get("sstMax").asString
-                            val marTotalMinimo = jsonObject.get("totalSeaMin").asString
+                            val marTotalMinimo = jsonObject.get("totalSeaMin").asDouble
                             val direcaoOnda = jsonObject.get("predWaveDir").asString
                             val temperaturaMinimaMar = jsonObject.get("sstMin").asString
 
 
                             val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
                             // Preencha o mapa com os nomes dos distritos e seus IDs globais
-                            marInformation.add(information)
+                            mar1Information.add(information)
                             if(contador == 1){
-                                val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
-                                mar1RecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
-                                mar1RecyclerView.adapter = customAdapterMar
-                                marInformation.clear()
                                 waveDay2()
                                 contador = 2
                             }
@@ -384,25 +376,22 @@ class MarActivity : AppCompatActivity() {
                             val jsonObject = element.asJsonObject
                             val globalIdLocal = jsonObject.get("globalIdLocal").asString
                             val periodoMinimoOnda = jsonObject.get("wavePeriodMin").asString
-                            val marTotalMaximo = jsonObject.get("totalSeaMax").asString
+                            val marTotalMaximo = jsonObject.get("totalSeaMax").asDouble
                             val ondulacaoMax = jsonObject.get("waveHighMax").asString
                             val ondulacaoMin = jsonObject.get("waveHighMin").asString
                             val periodoMaximoOnda = jsonObject.get("wavePeriodMax").asString
                             val temperaturaMaximaMar = jsonObject.get("sstMax").asString
-                            val marTotalMinimo = jsonObject.get("totalSeaMin").asString
+                            val marTotalMinimo = jsonObject.get("totalSeaMin").asDouble
                             val direcaoOnda = jsonObject.get("predWaveDir").asString
                             val temperaturaMinimaMar = jsonObject.get("sstMin").asString
 
 
                             val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
                             // Preencha o mapa com os nomes dos distritos e seus IDs globais
-                            marInformation.add(information)
+                            mar2Information.add(information)
                             if(contador == 2){
-                                val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
-                                mar2RecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
-                                mar2RecyclerView.adapter = customAdapterMar
-
-                                contador = 2
+                                contador = 0
+                                sendRecyclerView()
                             }
                         }
                     } else {
@@ -418,6 +407,12 @@ class MarActivity : AppCompatActivity() {
 
             }
         })
+    }
+    fun sendRecyclerView(){
+        val customAdapterMar = CustomAdapterMar(marInformation,mar1Information, mar2Information, globalId, this@MarActivity)
+        marRecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
+        marRecyclerView.adapter = customAdapterMar
+        marInformation.clear()
     }
 
        /* fun uvUpdate(){

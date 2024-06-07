@@ -1,36 +1,23 @@
 package com.example.myapplication
 
-import com.example.myapplication.models.TempoInformation
 import android.content.Context
-import android.icu.text.DecimalFormat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.models.MarInformation
-import com.example.myapplication.models.UvInformation
-import java.math.MathContext
-import java.math.RoundingMode
-import kotlin.math.roundToInt
-
-//import com.bumptech.glide.Glide
 
 class CustomAdapterMar(
-    private val dataDay: ArrayList<MarInformation>,
-    private val dataDay1 : ArrayList<MarInformation>,
-    private val dataDay2 : ArrayList<MarInformation>,
+    private val dataDay: List<MarInformation>,
+    private val dataDay1: List<MarInformation>,
+    private val dataDay2: List<MarInformation>,
     private val globalIdSelecionado: String,
     private val context: Context,
 ) : RecyclerView.Adapter<CustomAdapterMar.ViewHolder>() {
 
-    interface OnItemClickListener {
-        fun onItemClick(position: Int)
-    }
-
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val dataTextView: TextView = view.findViewById(R.id.dataTextView)
         val periodoMinimoOndaTextView: TextView = view.findViewById(R.id.periodoMinimoOndaTextView)
         val periodoMaximoOndaTextView: TextView = view.findViewById(R.id.periodoMaximoOndaTextView)
         val alturaMinimaMarTextView: TextView = view.findViewById(R.id.alturaMinimaMarTextView)
@@ -49,48 +36,26 @@ class CustomAdapterMar(
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        for (i in 0 until dataDay.size) {
-            if(dataDay[i].globalIdLocal == globalIdSelecionado) {
-                viewHolder.periodoMinimoOndaTextView.text = dataDay[i].periodoMinimoOnda
-                viewHolder.periodoMaximoOndaTextView.text = dataDay[i].periodoMaximoOnda
-                viewHolder.alturaMinimaMarTextView.text = dataDay[i].marTotalMinimo.toString()
-                viewHolder.alturaMaximaMarTextView.text = dataDay[i].marTotalMaximo.toString()
-                viewHolder.ondulacaoMinimaTextView.text = dataDay[i].ondulacaoMinima
-                viewHolder.ondulacaoMaximaTextView.text = dataDay[i].ondulacaoMax
-                viewHolder.temperaturaMinimaMarTextView.text = dataDay[i].temperaturaMinimaMar
-                viewHolder.temperaturaMaximaMarTextView.text = dataDay[i].temperaturaMaximaMar
-                viewHolder.direcaoOndaTextView.text = dataDay[i].direcaoOnda
-            }
-        }
-        for (i in 0 until dataDay1.size) {
-            if(dataDay1[i].globalIdLocal == globalIdSelecionado) {
-                viewHolder.periodoMinimoOndaTextView.text = dataDay1[i].periodoMinimoOnda
-                viewHolder.periodoMaximoOndaTextView.text = dataDay1[i].periodoMaximoOnda
-                viewHolder.alturaMinimaMarTextView.text = dataDay1[i].marTotalMinimo.toString()
-                viewHolder.alturaMaximaMarTextView.text = dataDay1[i].marTotalMaximo.toString()
-                viewHolder.ondulacaoMinimaTextView.text = dataDay1[i].ondulacaoMinima
-                viewHolder.ondulacaoMaximaTextView.text = dataDay1[i].ondulacaoMax
-                viewHolder.temperaturaMinimaMarTextView.text = dataDay1[i].temperaturaMinimaMar
-                viewHolder.temperaturaMaximaMarTextView.text = dataDay1[i].temperaturaMaximaMar
-                viewHolder.direcaoOndaTextView.text = dataDay1[i].direcaoOnda
-            }
-        }
-        for (i in 0 until dataDay2.size) {
-            if(dataDay2[i].globalIdLocal == globalIdSelecionado) {
-                viewHolder.periodoMinimoOndaTextView.text = dataDay2[i].periodoMinimoOnda
-                viewHolder.periodoMaximoOndaTextView.text = dataDay2[i].periodoMaximoOnda
-                viewHolder.alturaMinimaMarTextView.text = dataDay2[i].marTotalMinimo.toString()
-                viewHolder.alturaMaximaMarTextView.text = dataDay2[i].marTotalMaximo.toString()
-                viewHolder.ondulacaoMinimaTextView.text = dataDay2[i].ondulacaoMinima
-                viewHolder.ondulacaoMaximaTextView.text = dataDay2[i].ondulacaoMax
-                viewHolder.temperaturaMinimaMarTextView.text = dataDay2[i].temperaturaMinimaMar
-                viewHolder.temperaturaMaximaMarTextView.text = dataDay2[i].temperaturaMaximaMar
-                viewHolder.direcaoOndaTextView.text = dataDay2[i].direcaoOnda
-            }
+        val marInformation: MarInformation? = when (position) {
+            0 -> dataDay.find { it.globalIdLocal == globalIdSelecionado }
+            1 -> dataDay1.find { it.globalIdLocal == globalIdSelecionado }
+            2 -> dataDay2.find { it.globalIdLocal == globalIdSelecionado }
+            else -> null
         }
 
+        marInformation?.let {
+            viewHolder.dataTextView.text = it.dia
+            viewHolder.periodoMinimoOndaTextView.text = it.periodoMinimoOnda
+            viewHolder.periodoMaximoOndaTextView.text = it.periodoMaximoOnda
+            viewHolder.alturaMinimaMarTextView.text = it.marTotalMinimo.toString()
+            viewHolder.alturaMaximaMarTextView.text = it.marTotalMaximo.toString()
+            viewHolder.ondulacaoMinimaTextView.text = it.ondulacaoMinima
+            viewHolder.ondulacaoMaximaTextView.text = it.ondulacaoMax
+            viewHolder.temperaturaMinimaMarTextView.text = it.temperaturaMinimaMar
+            viewHolder.temperaturaMaximaMarTextView.text = it.temperaturaMaximaMar
+            viewHolder.direcaoOndaTextView.text = it.direcaoOnda
+        }
     }
 
-
-    override fun getItemCount(): Int = dataDay.size
+    override fun getItemCount(): Int = 3
 }

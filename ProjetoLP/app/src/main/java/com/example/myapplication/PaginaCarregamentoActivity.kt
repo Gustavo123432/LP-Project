@@ -32,7 +32,7 @@ class PaginaCarregamentoActivity : AppCompatActivity() {
         progressBar()
     }
     fun progressBar(){
-        val totalTime = 5000
+        val totalTime = 3000
         val interval = 100
 
         val countDownTimer = object : CountDownTimer(totalTime.toLong(), interval.toLong()) {

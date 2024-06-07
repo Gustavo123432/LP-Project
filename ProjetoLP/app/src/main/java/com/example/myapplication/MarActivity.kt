@@ -1,8 +1,9 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
-import android.health.connect.datatypes.Vo2MaxRecord
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -12,12 +13,14 @@ import android.widget.ArrayAdapter
 import android.widget.ProgressBar
 import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.api.Endpoint
+import com.example.myapplication.definicoes.DefinicoesActivity
 import com.example.myapplication.models.MarInformation
 import com.example.myapplication.models.TempoInformation
 import com.example.myapplication.models.UvInformation
@@ -27,6 +30,10 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import retrofit2.Call
 import retrofit2.Response
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
 
 class MarActivity : AppCompatActivity() {
     private lateinit var testSpinner : Spinner
@@ -42,12 +49,16 @@ class MarActivity : AppCompatActivity() {
     var marInformation = ArrayList<MarInformation>()
     var mar1Information = ArrayList<MarInformation>()
     var mar2Information = ArrayList<MarInformation>()
-    var uvInformation = ArrayList<UvInformation>()
 
     private val totalTime = 500
     private val interval = 100
     private var elapsedTime = 0
+    private var todayFormatted =""
+    private var tomorrowFormatted=""
+    private var dayAfterTomorrowFormatted=""
+
     var globalId = ""
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -59,28 +70,30 @@ class MarActivity : AppCompatActivity() {
         }
         testSpinner = findViewById(R.id.localMarSpinner)
         marRecyclerView = findViewById(R.id.marRecyclerView)
-//        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView = findViewById(R.id.bottomNavigationViewMar)
+        progressBar = findViewById(R.id.progressBar3)
         getCurrencies()
 
-       /* val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val dateFormatter = DateTimeFormatter.ofPattern("dd, EEEE", Locale("pt", "BR"))
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
         val dayAfterTomorrow = today.plusDays(2)
 
-        val todayFormatted = today.format(dateFormatter)
-        val tomorrowFormatted = tomorrow.format(dateFormatter)
-        val dayAfterTomorrowFormatted = dayAfterTomorrow.format(dateFormatter)*/
+        todayFormatted = today.format(dateFormatter)
+        tomorrowFormatted = tomorrow.format(dateFormatter)
+        dayAfterTomorrowFormatted = dayAfterTomorrow.format(dateFormatter)
 
-        /*bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.homeFragment -> {
+                R.id.tempo -> {
                     val intent = Intent(this, MostraMetreologiaActivity::class.java)
                     startActivity(intent)
                     true
                 }
-                R.id.profileFragment -> {
-                    /*val intent = Intent(this, ProfileActivity::class.java)
-                    startActivity(intent)*/
+                R.id.mar -> {
+                    val intent = Intent(this, MarActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.settings -> {
@@ -97,86 +110,10 @@ class MarActivity : AppCompatActivity() {
                 }
                 else -> false
             }
-        }*/
+        }
     }
 
 
-        /*@SuppressLint("ScheduleExactAlarm")
-        private fun scheduleNotification(temperaturaMaxima: String, temperaturamMinima: String) {
-            val temperaturaMaximaa = temperaturaMaxima.toDouble().roundToInt().toString()
-            val temperaturaMinimaa = temperaturamMinima.toDouble().roundToInt().toString()
-            val intent = Intent(applicationContext, Notification::class.java)
-            val title = "Notificação de Temperatura"
-            val message = "A Temp. Minima é de " + temperaturaMinimaa + "º \nTemp. Máxima é de " + temperaturaMaximaa + "º"
-            intent.putExtra(titleExtra, title)
-            intent.putExtra(messageExtra, message)
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                applicationContext,
-                NOTIFICATION_ID,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val time = getTime()
-
-            // Agendar notificação repetitiva todos os dias às 7:30
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP,
-                time,
-                AlarmManager.INTERVAL_DAY,
-                pendingIntent
-            )
-
-            showAlert(time, title, message)
-        }
-
-                private fun showAlert(time: Long, title: String, message: String) {
-            val date = Date(time)
-            val dateFormat = android.text.format.DateFormat.getLongDateFormat(applicationContext)
-            val timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext)
-
-            AlertDialog.Builder(this)
-                .setTitle("Notification Scheduled")
-                .setMessage("Title: " + title
-                        + "\nMessage: " + message
-                        + "\nAt: " + dateFormat.format(date) + " " + timeFormat.format(date))
-                .setPositiveButton("Okay") { _, _ -> }
-                .show()
-        }
-
-                private fun getTime(): Long {
-
-            sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-            val dia = sharedPreferences.getString("diaSemana", null)
-            val hour = sharedPreferences.getInt("hour", 7)
-            val minute = sharedPreferences.getInt("minute", 30)
-
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.HOUR_OF_DAY, hour)
-            calendar.set(Calendar.MINUTE, minute)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-
-            // Se a hora atual for depois das 7:30 de hoje, agendar para amanhã
-            if (calendar.timeInMillis < System.currentTimeMillis()) {
-                calendar.add(Calendar.DAY_OF_YEAR, 1)
-            }
-
-            return calendar.timeInMillis
-        }
-
-        @SuppressLint("NewApi")
-        private fun createNotificationChannel() {
-            val name = "Notification Channel"
-            val desc = "A Description of the Channel"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance)
-            channel.description = desc
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }*/
 
         fun getCurrencies (){
             val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
@@ -228,12 +165,11 @@ class MarActivity : AppCompatActivity() {
                                     marInformation.clear()
                                     mar1Information.clear()
                                     mar2Information.clear()
+                                    progressBar()
+                                    waveDay0()
                                   /*  val customAdapterTempo = CustomAdapterMar(marInformation, mar1Information, mar2Information, globalId, this@MarActivity)
                                     marRecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
                                     marRecyclerView.adapter = customAdapterTempo*/
-                                    //progressBar()
-                                    waveDay0()
-                                    conta == 0
                                     // Faça o que for necessário com o ID global
                                     // Por exemplo, armazene-o em uma variável ou passe-o para outra função
                                     Log.d("Selected District", "Name: $selectedDistrict, Global ID: $globalId")
@@ -284,15 +220,15 @@ class MarActivity : AppCompatActivity() {
                                 val marTotalMinimo = jsonObject.get("totalSeaMin").asDouble
                                 val direcaoOnda = jsonObject.get("predWaveDir").asString
                                 val temperaturaMinimaMar = jsonObject.get("sstMin").asString
+                                val dia = todayFormatted.toString()
 
 
-                                val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
+                                val information = MarInformation(globalIdLocal,dia, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
                                 // Preencha o mapa com os nomes dos distritos e seus IDs globais
                                 marInformation.add(information)
-                                if(contador == 0){
-                                    waveDay1()
-                                    contador = 1
-                                } }
+                               }
+
+                                waveDay1()
                         } else {
                             Log.e("Response Error", "Response body is null")
                         }
@@ -334,15 +270,13 @@ class MarActivity : AppCompatActivity() {
                             val marTotalMinimo = jsonObject.get("totalSeaMin").asDouble
                             val direcaoOnda = jsonObject.get("predWaveDir").asString
                             val temperaturaMinimaMar = jsonObject.get("sstMin").asString
+                            val dia = tomorrowFormatted.toString()
 
 
-                            val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
+                            val information = MarInformation(globalIdLocal,dia, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
                             // Preencha o mapa com os nomes dos distritos e seus IDs globais
                             mar1Information.add(information)
-                            if(contador == 1){
-                                waveDay2()
-                                contador = 2
-                            }
+                            waveDay2()
                         }
                     } else {
                         Log.e("Response Error", "Response body is null")
@@ -384,98 +318,65 @@ class MarActivity : AppCompatActivity() {
                             val marTotalMinimo = jsonObject.get("totalSeaMin").asDouble
                             val direcaoOnda = jsonObject.get("predWaveDir").asString
                             val temperaturaMinimaMar = jsonObject.get("sstMin").asString
+                            val dia = dayAfterTomorrowFormatted.toString()
 
 
-                            val information = MarInformation(globalIdLocal, periodoMinimoOnda, marTotalMaximo, ondulacaoMax, ondulacaoMin, periodoMaximoOnda, marTotalMinimo ,temperaturaMaximaMar, direcaoOnda, temperaturaMinimaMar)
+                            val information = MarInformation(
+                                globalIdLocal,
+                                dia,
+                                periodoMinimoOnda,
+                                marTotalMaximo,
+                                ondulacaoMax,
+                                ondulacaoMin,
+                                periodoMaximoOnda,
+                                marTotalMinimo,
+                                temperaturaMaximaMar,
+                                direcaoOnda,
+                                temperaturaMinimaMar
+                            )
                             // Preencha o mapa com os nomes dos distritos e seus IDs globais
                             mar2Information.add(information)
-                            if(contador == 2){
-                                contador = 0
-                                sendRecyclerView()
-                            }
+
                         }
-                    } else {
-                        Log.e("Response Error", "Response body is null")
+
+                        sendRecyclerView()
                     }
                 } else {
                     Log.e("Response Error", "Unsuccessful response: ${response.code()}")
                 }
             }
 
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                print("não foi")
 
-            }
+                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                    print("não foi")
+
+                }
+
+
         })
     }
     fun sendRecyclerView(){
         val customAdapterMar = CustomAdapterMar(marInformation,mar1Information, mar2Information, globalId, this@MarActivity)
         marRecyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
         marRecyclerView.adapter = customAdapterMar
-        marInformation.clear()
     }
 
-       /* fun uvUpdate(){
-            val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
-            val endpoint = retrofitClient.create(Endpoint::class.java)
+    fun progressBar(){
 
-            endpoint.getUv().enqueue(object : retrofit2.Callback<JsonArray> {
-                override fun onResponse(call: Call<JsonArray>, response: Response<JsonArray>) {
-                    if (response.isSuccessful) {
-                        val data = mutableListOf<String>()
-                        val body = response.body()
-
-                        if (body != null) {
-                            val jsonArray = body.getAsJsonArray()
-
-                            jsonArray?.forEach { element ->
-                                val jsonObject = element.asJsonObject
-                                val globalIdLocal = jsonObject.get("globalIdLocal").asString
-                                val iUv = jsonObject.get("iUv").asString
-                                val data = jsonObject.get("data").asString
-
-                                val information = UvInformation(globalIdLocal, iUv, data)
-                                // Preencha o mapa com os nomes dos distritos e seus IDs globais
-                                uvInformation.add(information)
-                            }
-                            val customAdapterMar = CustomAdapterMar(marInformation, globalId, this@MarActivity)
-                            recyclerView.layoutManager = LinearLayoutManager(this@MarActivity, LinearLayoutManager.HORIZONTAL, false)
-                            recyclerView.adapter = customAdapterMar
-
-                        } else {
-                            Log.e("Response Error", "Response body is null")
-                        }
-                    } else {
-                        Log.e("Response Error", "Unsuccessful response: ${response.code()}")
-                    }
-                }
-
-                override fun onFailure(call: Call<JsonArray>, t: Throwable) {
-                    print("não foi")
-
-                }
-            })
-        }*/
-        fun progressBar(){
-
-            val countDownTimer = object : CountDownTimer(totalTime.toLong(), interval.toLong()) {
-                override fun onTick(millisUntilFinished: Long) {
-                    progressBar.visibility = View.VISIBLE
-                    val progress = ((totalTime - millisUntilFinished).toFloat() / totalTime * 100).toInt()
-                    progressBar.progress = progress
-                }
-
-                override fun onFinish() {
-                    progressBar.visibility = View.INVISIBLE
-                    progressBar.progress = 100
-                }
+        val countDownTimer = object : CountDownTimer(totalTime.toLong(), interval.toLong()) {
+            override fun onTick(millisUntilFinished: Long) {
+                progressBar.visibility = View.VISIBLE
+                val progress = ((totalTime - millisUntilFinished).toFloat() / totalTime * 100).toInt()
+                progressBar.progress = progress
             }
 
-            countDownTimer.start()
+            override fun onFinish() {
+                progressBar.visibility = View.INVISIBLE
+                progressBar.progress = 100
+            }
         }
 
-}
-
-private fun <E> ArrayList<E>.add(dia: String?, tempoId: String?, temperaturamMinima: String?, temperaturaMaxima: String?, direcaoVento: String?, precipitacao: String?) {
+        countDownTimer.start()
+    }
 
 }

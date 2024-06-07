@@ -3,16 +3,21 @@ package com.example.myapplication
 import com.example.myapplication.models.TempoInformation
 import android.content.Context
 import android.icu.text.DecimalFormat
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.models.UvInformation
 import java.math.MathContext
 import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.math.roundToInt
 
 //import com.bumptech.glide.Glide
@@ -45,11 +50,15 @@ class CustomAdapterTempo(
         return ViewHolder(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val data = dataSet[position]
+        val diaNoFormatted = LocalDate.parse(data.dia)
+        val dateFormatter = DateTimeFormatter.ofPattern("dd, EEEE", Locale("pt", "BR"))
+        val dia = diaNoFormatted.format(dateFormatter)
 
 
-        viewHolder.diaTextView.text = data.dia
+        viewHolder.diaTextView.text = dia
         imagemTempo(data.tempoImage, viewHolder.tempoImageView)
         imagemVento(data.ventoDirection, viewHolder.ventoImageView)
         viewHolder.minTempTextView.text = data.minTemperatura.toDouble().roundToInt().toString()

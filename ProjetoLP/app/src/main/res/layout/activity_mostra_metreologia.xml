@@ -27,7 +27,8 @@
         android:requiresFadingEdge="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerTest" />
+        app:layout_constraintTop_toBottomOf="@+id/spinnerTest"
+        tools:listitem="@layout/tempo" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

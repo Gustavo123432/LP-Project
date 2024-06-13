@@ -15,6 +15,7 @@ import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +24,6 @@ import com.example.myapplication.api.Endpoint
 import com.example.myapplication.definicoes.DefinicoesActivity
 import com.example.myapplication.models.MarInformation
 import com.example.myapplication.models.TempoInformation
-import com.example.myapplication.models.UvInformation
 import com.example.myapplication.util.NetworkUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.JsonArray
@@ -41,7 +41,7 @@ class MarActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var bottomNavigationView: BottomNavigationView
     private  lateinit var sharedPreferences: SharedPreferences
-
+    private lateinit var constraintLayout: ConstraintLayout
     private var conta = 0
     private var contador = 0
     var districtGlobalIds = mutableMapOf<String, Int>()
@@ -72,7 +72,17 @@ class MarActivity : AppCompatActivity() {
         marRecyclerView = findViewById(R.id.marRecyclerView)
         bottomNavigationView = findViewById(R.id.bottomNavigationViewMar)
         progressBar = findViewById(R.id.progressBar3)
+        constraintLayout = findViewById(R.id.main)
+
         getCurrencies()
+
+        sharedPreferences = getSharedPreferences("def", Context.MODE_PRIVATE)
+        val checked = sharedPreferences.getBoolean("switch_checked", false)
+        if (checked) {
+            constraintLayout.setBackgroundColor(getColor(R.color.cinzaEscuro))
+        } else {
+            constraintLayout.setBackgroundColor(getColor(R.color.white))
+        }
 
         val dateFormatter = DateTimeFormatter.ofPattern("dd, EEEE", Locale("pt", "BR"))
         val today = LocalDate.now()

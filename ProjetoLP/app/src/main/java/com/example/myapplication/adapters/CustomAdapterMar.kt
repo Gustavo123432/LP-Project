@@ -1,10 +1,13 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.models.MarInformation
 
@@ -27,6 +30,17 @@ class CustomAdapterMar(
         val temperaturaMinimaMarTextView: TextView = view.findViewById(R.id.temperaturaMinimaMarTextView)
         val temperaturaMaximaMarTextView: TextView = view.findViewById(R.id.temperaturaMaximaMarTextView)
         val direcaoOndaTextView: TextView = view.findViewById(R.id.direcaoOndaTextView)
+        val textView1: TextView = view.findViewById(R.id.textView6)
+        val textView2: TextView = view.findViewById(R.id.textView9)
+        val textView3: TextView = view.findViewById(R.id.textView11)
+        val textView4: TextView = view.findViewById(R.id.textView13)
+        val textView5: TextView = view.findViewById(R.id.textView15)
+        val textView6: TextView = view.findViewById(R.id.textView17)
+        val textView7: TextView = view.findViewById(R.id.textView19)
+        val textView8: TextView = view.findViewById(R.id.textView21)
+        val textView9: TextView = view.findViewById(R.id.textView23)
+        val constraintLayout: ConstraintLayout = view.findViewById(R.id.mainMar)
+
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -44,6 +58,52 @@ class CustomAdapterMar(
         }
 
         marInformation?.let {
+            val sharedPreferences : SharedPreferences
+            sharedPreferences = context.getSharedPreferences("def", Context.MODE_PRIVATE)
+            val checked = sharedPreferences.getBoolean("switch_checked", false)
+            if (checked) {
+                viewHolder.dataTextView.setTextColor(Color.WHITE)
+                viewHolder.periodoMaximoOndaTextView.setTextColor(Color.WHITE)
+                viewHolder.periodoMinimoOndaTextView.setTextColor(Color.WHITE)
+                viewHolder.alturaMaximaMarTextView.setTextColor(Color.WHITE)
+                viewHolder.alturaMinimaMarTextView.setTextColor(Color.WHITE)
+                viewHolder.ondulacaoMaximaTextView.setTextColor(Color.WHITE)
+                viewHolder.ondulacaoMinimaTextView.setTextColor(Color.WHITE)
+                viewHolder.temperaturaMaximaMarTextView.setTextColor(Color.WHITE)
+                viewHolder.temperaturaMinimaMarTextView.setTextColor(Color.WHITE)
+                viewHolder.direcaoOndaTextView.setTextColor(Color.WHITE)
+                viewHolder.textView1.setTextColor(Color.WHITE)
+                viewHolder.textView2.setTextColor(Color.WHITE)
+                viewHolder.textView3.setTextColor(Color.WHITE)
+                viewHolder.textView4.setTextColor(Color.WHITE)
+                viewHolder.textView5.setTextColor(Color.WHITE)
+                viewHolder.textView6.setTextColor(Color.WHITE)
+                viewHolder.textView7.setTextColor(Color.WHITE)
+                viewHolder.textView8.setTextColor(Color.WHITE)
+                viewHolder.textView9.setTextColor(Color.WHITE)
+            } else {
+                viewHolder.dataTextView.setTextColor(Color.BLACK)
+                viewHolder.periodoMaximoOndaTextView.setTextColor(Color.BLACK)
+                viewHolder.periodoMinimoOndaTextView.setTextColor(Color.BLACK)
+                viewHolder.alturaMaximaMarTextView.setTextColor(Color.BLACK)
+                viewHolder.alturaMinimaMarTextView.setTextColor(Color.BLACK)
+                viewHolder.ondulacaoMaximaTextView.setTextColor(Color.BLACK)
+                viewHolder.ondulacaoMinimaTextView.setTextColor(Color.BLACK)
+                viewHolder.temperaturaMaximaMarTextView.setTextColor(Color.BLACK)
+                viewHolder.temperaturaMinimaMarTextView.setTextColor(Color.BLACK)
+                viewHolder.direcaoOndaTextView.setTextColor(Color.BLACK)
+                viewHolder.textView1.setTextColor(Color.BLACK)
+                viewHolder.textView2.setTextColor(Color.BLACK)
+                viewHolder.textView3.setTextColor(Color.BLACK)
+                viewHolder.textView4.setTextColor(Color.BLACK)
+                viewHolder.textView5.setTextColor(Color.BLACK)
+                viewHolder.textView6.setTextColor(Color.BLACK)
+                viewHolder.textView7.setTextColor(Color.BLACK)
+                viewHolder.textView8.setTextColor(Color.BLACK)
+                viewHolder.textView9.setTextColor(Color.BLACK)
+
+
+            }
             viewHolder.dataTextView.text = it.dia
             viewHolder.periodoMinimoOndaTextView.text = it.periodoMinimoOnda
             viewHolder.periodoMaximoOndaTextView.text = it.periodoMaximoOnda
@@ -58,4 +118,6 @@ class CustomAdapterMar(
     }
 
     override fun getItemCount(): Int = 3
+
+
 }

@@ -26,4 +26,6 @@
     <string name="temperaturaMaxima">Temperatura Máxima Mar</string>
     <string name="temperaturaMinima">Temperatura Minima Mar</string>
     <string name="direcaoOnda">Direção Onda</string>
+    <string name="Tema" />
+    <string name="tem">Tema</string>
 </resources>

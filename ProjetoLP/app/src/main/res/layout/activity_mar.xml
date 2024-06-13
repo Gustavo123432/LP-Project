@@ -10,10 +10,11 @@
     <Spinner
         android:id="@+id/localMarSpinner"
         android:layout_width="match_parent"
-        android:layout_height="26dp"
+        android:layout_height="35dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
+        android:background="@drawable/shape_button_setting"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"

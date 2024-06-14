@@ -2,6 +2,8 @@ package com.example.myapplication
 
 import com.example.myapplication.models.TempoInformation
 import android.content.Context
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.icu.text.DecimalFormat
 import android.os.Build
 import android.util.Log
@@ -42,6 +44,7 @@ class CustomAdapterTempo(
         val ventoDirectionTextView: TextView = view.findViewById(R.id.ventoDirectionTextView)
         val precipitacaoTextView: TextView = view.findViewById(R.id.precipitacaoTextView)
         val uvImageView: ImageView = view.findViewById(R.id.uvImageView)
+        val textView8: TextView = view.findViewById(R.id.textView8)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -56,6 +59,21 @@ class CustomAdapterTempo(
         val diaNoFormatted = LocalDate.parse(data.dia)
         val dateFormatter = DateTimeFormatter.ofPattern("dd, EEEE", Locale("pt", "BR"))
         val dia = diaNoFormatted.format(dateFormatter)
+
+        val sharedPreferences : SharedPreferences
+        sharedPreferences = context.getSharedPreferences("def", Context.MODE_PRIVATE)
+        val checked = sharedPreferences.getBoolean("switch_checked", false)
+        if (checked) {
+            viewHolder.diaTextView.setTextColor(Color.WHITE)
+            viewHolder.ventoDirectionTextView.setTextColor(Color.WHITE)
+            viewHolder.precipitacaoTextView.setTextColor(Color.WHITE)
+            viewHolder.textView8.setTextColor(Color.WHITE)
+        } else {
+            viewHolder.diaTextView.setTextColor(Color.BLACK)
+            viewHolder.ventoDirectionTextView.setTextColor(Color.BLACK)
+            viewHolder.precipitacaoTextView.setTextColor(Color.BLACK)
+            viewHolder.textView8.setTextColor(Color.BLACK)
+        }
 
 
         viewHolder.diaTextView.text = dia

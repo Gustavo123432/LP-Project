@@ -19,6 +19,7 @@ import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,6 +51,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var bottomNavigationView: BottomNavigationView
     private  lateinit var sharedPreferences: SharedPreferences
+    private lateinit var constraintLayout: ConstraintLayout
 
     private var conta = 0
     var districtGlobalIds = mutableMapOf<String, Int>()
@@ -66,7 +68,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_mostra_metreologia)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainMar)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -75,7 +77,17 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         progressBar = findViewById(R.id.progressBar)
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        constraintLayout = findViewById(R.id.main)
         getCurrencies()
+
+        sharedPreferences = getSharedPreferences("def", Context.MODE_PRIVATE)
+        val checked = sharedPreferences.getBoolean("switch_checked", false)
+        if (checked) {
+            constraintLayout.setBackgroundColor(getColor(R.color.cinzaEscuro))
+        } else {
+            constraintLayout.setBackgroundColor(getColor(R.color.white))
+        }
+
 
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val today = LocalDate.now()

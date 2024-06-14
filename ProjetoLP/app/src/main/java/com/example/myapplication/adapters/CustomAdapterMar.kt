@@ -83,15 +83,15 @@ class CustomAdapterMar(
                 viewHolder.textView9.setTextColor(Color.WHITE)
             } else {
                 viewHolder.dataTextView.setTextColor(Color.BLACK)
-                viewHolder.periodoMaximoOndaTextView.setTextColor(Color.BLACK)
-                viewHolder.periodoMinimoOndaTextView.setTextColor(Color.BLACK)
-                viewHolder.alturaMaximaMarTextView.setTextColor(Color.BLACK)
-                viewHolder.alturaMinimaMarTextView.setTextColor(Color.BLACK)
-                viewHolder.ondulacaoMaximaTextView.setTextColor(Color.BLACK)
-                viewHolder.ondulacaoMinimaTextView.setTextColor(Color.BLACK)
-                viewHolder.temperaturaMaximaMarTextView.setTextColor(Color.BLACK)
-                viewHolder.temperaturaMinimaMarTextView.setTextColor(Color.BLACK)
-                viewHolder.direcaoOndaTextView.setTextColor(Color.BLACK)
+                viewHolder.periodoMaximoOndaTextView.setTextColor(Color.GRAY)
+                viewHolder.periodoMinimoOndaTextView.setTextColor(Color.GRAY)
+                viewHolder.alturaMaximaMarTextView.setTextColor(Color.GRAY)
+                viewHolder.alturaMinimaMarTextView.setTextColor(Color.GRAY)
+                viewHolder.ondulacaoMaximaTextView.setTextColor(Color.GRAY)
+                viewHolder.ondulacaoMinimaTextView.setTextColor(Color.GRAY)
+                viewHolder.temperaturaMaximaMarTextView.setTextColor(Color.GRAY)
+                viewHolder.temperaturaMinimaMarTextView.setTextColor(Color.GRAY)
+                viewHolder.direcaoOndaTextView.setTextColor(Color.GRAY)
                 viewHolder.textView1.setTextColor(Color.BLACK)
                 viewHolder.textView2.setTextColor(Color.BLACK)
                 viewHolder.textView3.setTextColor(Color.BLACK)
@@ -105,14 +105,14 @@ class CustomAdapterMar(
 
             }
             viewHolder.dataTextView.text = it.dia
-            viewHolder.periodoMinimoOndaTextView.text = it.periodoMinimoOnda
-            viewHolder.periodoMaximoOndaTextView.text = it.periodoMaximoOnda
-            viewHolder.alturaMinimaMarTextView.text = it.marTotalMinimo.toString()
-            viewHolder.alturaMaximaMarTextView.text = it.marTotalMaximo.toString()
-            viewHolder.ondulacaoMinimaTextView.text = it.ondulacaoMinima
-            viewHolder.ondulacaoMaximaTextView.text = it.ondulacaoMax
-            viewHolder.temperaturaMinimaMarTextView.text = it.temperaturaMinimaMar
-            viewHolder.temperaturaMaximaMarTextView.text = it.temperaturaMaximaMar
+            viewHolder.periodoMinimoOndaTextView.text = it.periodoMinimoOnda.replace(".", ",")+"0"
+            viewHolder.periodoMaximoOndaTextView.text = it.periodoMaximoOnda.replace(".", ",")+"0"
+            viewHolder.alturaMinimaMarTextView.text = it.marTotalMinimo.toString().replace(".", ",")+"0"+"m"
+            viewHolder.alturaMaximaMarTextView.text = it.marTotalMaximo.toString().replace(".", ",")+"0"+"m"
+            viewHolder.ondulacaoMinimaTextView.text = it.ondulacaoMinima.replace(".", ",")+"0"
+            viewHolder.ondulacaoMaximaTextView.text = it.ondulacaoMax.replace(".", ",")+"0"
+            viewHolder.temperaturaMinimaMarTextView.text = it.temperaturaMinimaMar+"ºC".replace(".", ",")
+            viewHolder.temperaturaMaximaMarTextView.text = it.temperaturaMaximaMar+"ºC".replace(".", ",")
             viewHolder.direcaoOndaTextView.text = it.direcaoOnda
         }
     }

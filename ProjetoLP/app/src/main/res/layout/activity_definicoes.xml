@@ -13,12 +13,12 @@
         android:layout_height="wrap_content"
         android:background="@color/cinza"
         app:itemIconSize="30dp"
-        app:labelVisibilityMode="labeled"
+        app:labelVisibilityMode="selected"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/botao_nav" >
+        app:menu="@menu/botao_nav">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 

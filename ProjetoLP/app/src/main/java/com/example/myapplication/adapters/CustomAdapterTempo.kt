@@ -70,9 +70,9 @@ class CustomAdapterTempo(
             viewHolder.textView8.setTextColor(Color.WHITE)
         } else {
             viewHolder.diaTextView.setTextColor(Color.BLACK)
-            viewHolder.ventoDirectionTextView.setTextColor(Color.BLACK)
-            viewHolder.precipitacaoTextView.setTextColor(Color.BLACK)
-            viewHolder.textView8.setTextColor(Color.BLACK)
+            viewHolder.ventoDirectionTextView.setTextColor(Color.GRAY)
+            viewHolder.precipitacaoTextView.setTextColor(Color.GRAY)
+            viewHolder.textView8.setTextColor(Color.GRAY)
         }
 
 

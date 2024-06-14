@@ -96,6 +96,11 @@ class MarActivity : AppCompatActivity() {
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
+                R.id.fav -> {
+                    val intent = Intent(this, FavoritoActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
                 R.id.tempo -> {
                     val intent = Intent(this, MostraMetreologiaActivity::class.java)
                     startActivity(intent)
@@ -113,6 +118,10 @@ class MarActivity : AppCompatActivity() {
                 }
                 R.id.logout -> {
                     sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().clear().apply()
+                    sharedPreferences = getSharedPreferences("def", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().clear().apply()
+                    sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
                     sharedPreferences.edit().clear().apply()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)

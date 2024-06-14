@@ -14,8 +14,10 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +37,10 @@ import com.example.myapplication.notify.messageExtra
 import com.example.myapplication.notify.titleExtra
 import com.example.myapplication.util.NetworkUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import retrofit2.Call
@@ -52,6 +58,9 @@ class MostraMetreologiaActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
     private  lateinit var sharedPreferences: SharedPreferences
     private lateinit var constraintLayout: ConstraintLayout
+    private lateinit var estrelaColoridaImageView: ImageView
+    private lateinit var favCustomAdapter: CustomAdapterTempo
+    private lateinit var estrelaImageView: ImageView
 
     private var conta = 0
     var districtGlobalIds = mutableMapOf<String, Int>()
@@ -77,6 +86,8 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         progressBar = findViewById(R.id.progressBar)
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        estrelaColoridaImageView = findViewById(R.id.estrelaColoridaImageView)
+        estrelaImageView = findViewById(R.id.estrelaImageView)
         constraintLayout = findViewById(R.id.main)
         getCurrencies()
 
@@ -87,6 +98,8 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         } else {
             constraintLayout.setBackgroundColor(getColor(R.color.white))
         }
+
+
 
 
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -100,6 +113,11 @@ class MostraMetreologiaActivity : AppCompatActivity() {
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
+                R.id.fav -> {
+                    val intent = Intent(this, FavoritoActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
                 R.id.tempo -> {
                     val intent = Intent(this, MostraMetreologiaActivity::class.java)
                     startActivity(intent)
@@ -118,6 +136,10 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                 R.id.logout -> {
                     sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().clear().apply()
+                    sharedPreferences = getSharedPreferences("def", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().clear().apply()
+                    sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().clear().apply()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     true
@@ -127,16 +149,53 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         }
     }
 
+    private fun removeItemFromDatabase(selectedDistrict: String) {
+        val sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
+        val uid = sharedPreferences.getString("uidProfile", "")
+
+        uid?.let {
+            val databaseReference = FirebaseDatabase.getInstance().getReference()
+                .child("Perfil").child(uid).child("locais")
+
+            databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (childSnapshot in snapshot.children) {
+                        val local = childSnapshot.child("local").getValue(String::class.java)
+                        local?.let {
+                            if (it == selectedDistrict) {
+                                childSnapshot.ref.removeValue().addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(this@MostraMetreologiaActivity, "Local removido do banco de dados", Toast.LENGTH_SHORT).show()
+                                        estrelaImageView.visibility = View.VISIBLE
+                                        estrelaColoridaImageView.visibility = View.INVISIBLE
+                                    } else {
+                                        Toast.makeText(this@MostraMetreologiaActivity, "Falha ao remover local do banco de dados", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Tratamento de erro, se necessário
+                }
+            })
+        }
+    }
+
+
 
     @SuppressLint("ScheduleExactAlarm")
     private fun scheduleNotification(temperaturaMaxima: String, temperaturamMinima: String) {
         val temperaturaMaximaa = temperaturaMaxima.toDouble().roundToInt().toString()
         val temperaturaMinimaa = temperaturamMinima.toDouble().roundToInt().toString()
-        val intent = Intent(applicationContext, Notification::class.java)
+        //val intent = Intent(applicationContext, Notification::class.java)
         val title = "Notificação de Temperatura"
         val message = "A Temp. Minima é de " + temperaturaMinimaa + "º \nTemp. Máxima é de " + temperaturaMaximaa + "º"
-        intent.putExtra(titleExtra, title)
-        intent.putExtra(messageExtra, message)
+        /*intent.putExtra(titleExtra, title)
+        intent.putExtra(messageExtra, message)*/
+        Toast.makeText(this, "Notificação agendada", Toast.LENGTH_SHORT).show()
 
         val pendingIntent = PendingIntent.getBroadcast(
             applicationContext,
@@ -156,7 +215,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
             pendingIntent
         )
 
-        showAlert(time, title, message)
+        //showAlert(time, title, message)
     }
 
     private fun showAlert(time: Long, title: String, message: String) {
@@ -251,6 +310,46 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 editor.putString("distrito", selectedDistrict)
                                 editor.putInt("position", position)
                                 editor.apply()
+                                estrelaColoridaImageView.setOnClickListener {
+                                    removeItemFromDatabase(selectedDistrict)
+                                }
+                                estrelaImageView.setOnClickListener {
+                                    sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
+                                    val uid = sharedPreferences.getString("uidProfile", "")
+                                    val databaseReference = FirebaseDatabase.getInstance().reference.child("Perfil").child(uid.toString()).child("locais")
+                                    val newData = HashMap<String, Any>()
+                                    newData["imagem"] = tempoInfomationn[0].tempoImage
+                                    newData["local"] = selectedDistrict
+                                    newData["tmax"] = tempoInfomationn[0].maxTemperatura
+                                    newData["tmin"] = tempoInfomationn[0].minTemperatura
+
+                                    // Find the next available ID
+                                    databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                            var nextId = 1 // Start from 1 if no existing data
+                                            for (childSnapshot in dataSnapshot.children) {
+                                                val id = childSnapshot.key?.toIntOrNull()
+                                                if (id != null && id >= nextId) {
+                                                    nextId = id + 1
+                                                }
+                                            }
+
+                                            // Set the new data with the next available ID
+                                            databaseReference.child(nextId.toString()).setValue(newData)
+                                            Toast.makeText(this@MostraMetreologiaActivity, "Local adicionado ao banco de dados", Toast.LENGTH_SHORT).show()
+                                            estrelaImageView.visibility = View.INVISIBLE
+                                            estrelaColoridaImageView.visibility = View.VISIBLE
+                                        }
+
+                                        override fun onCancelled(databaseError: DatabaseError) {
+                                            // Handle errors here
+                                        }
+                                    })
+                                }
+
+
+
+                                verFavorito()
 
                                 tempoInfomationn.clear()
                                 /*val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
@@ -283,7 +382,48 @@ class MostraMetreologiaActivity : AppCompatActivity() {
         })
     }
 
-        fun weatherUpdate() {
+    fun verFavorito() {
+        val sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
+        val uid = sharedPreferences.getString("uidProfile", "")
+
+        uid?.let {
+            val databaseReference = FirebaseDatabase.getInstance().getReference("Perfil").child(uid).child("locais")
+
+            databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val favoritos = ArrayList<String>()
+
+                    for (childSnapshot in snapshot.children) {
+                        val local = childSnapshot.child("local").getValue(String::class.java)
+                        local?.let { favoritos.add(it) }
+                    }
+                    verificarSelecao(favoritos)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Tratamento de erro, se necessário
+
+
+                }
+            })
+        }
+    }
+
+    private fun verificarSelecao(favoritos: List<String>) {
+        val selectedDistrict = testSpinner.selectedItem.toString()
+
+        if (favoritos.contains(selectedDistrict)) {
+            estrelaColoridaImageView.visibility = View.VISIBLE
+            estrelaImageView.visibility = View.INVISIBLE
+
+        } else {
+            estrelaColoridaImageView.visibility = View.INVISIBLE
+            estrelaImageView.visibility = View.VISIBLE
+        }
+    }
+
+
+    fun weatherUpdate() {
 
             val retrofitClient = NetworkUtils.getRetrofitInstance("https://api.ipma.pt/")
             val endpoint = retrofitClient.create(Endpoint::class.java)

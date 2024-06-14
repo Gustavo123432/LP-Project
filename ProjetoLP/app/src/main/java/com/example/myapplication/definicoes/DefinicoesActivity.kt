@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.myapplication.FavoritoActivity
 import com.example.myapplication.MainActivity
 import com.example.myapplication.MarActivity
 import com.example.myapplication.MostraMetreologiaActivity
@@ -82,6 +83,11 @@ class DefinicoesActivity : AppCompatActivity() {
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
+                R.id.fav -> {
+                    val intent = Intent(this, FavoritoActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
                 R.id.tempo -> {
                     val intent = Intent(this, MostraMetreologiaActivity::class.java)
                     startActivity(intent)
@@ -99,6 +105,10 @@ class DefinicoesActivity : AppCompatActivity() {
                 }
                 R.id.logout -> {
                     sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().clear().apply()
+                    sharedPreferences = getSharedPreferences("def", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().clear().apply()
+                    sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
                     sharedPreferences.edit().clear().apply()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)

@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Password Obrigatória", Toast.LENGTH_SHORT).show()
                 asteriscoPasswordTextView.visibility = View.VISIBLE
 
-            }else if(password.length < 6){
+            }else if(password.length < 7){
                 Toast.makeText(this, "Password Incorreta", Toast.LENGTH_SHORT).show()
                 asteriscoPasswordTextView.visibility = View.VISIBLE
             }
@@ -98,15 +98,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun loginUser(email: String, password: String) {
         val firebaseAuth = FirebaseAuth.getInstance()
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-            if (it.isSuccessful) {
-                saveLogin(email, password)
-                val intent = Intent(this, MostraMetreologiaActivity::class.java)
-                startActivity(intent)
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user = firebaseAuth.currentUser
+                user?.let {
+                    val uid = it.uid
+                    saveLogin(email, password)
+                    val sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
+                    val editor = sharedPreferences.edit()
+                    editor.putString("uidProfile", uid)
+                    editor.apply()
+                    val intent = Intent(this, FavoritoActivity::class.java)
+                    startActivity(intent)
+                }
             } else {
-
                 Toast.makeText(this, "Email ou Password Incorretos \n Tente Novamente!", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 }

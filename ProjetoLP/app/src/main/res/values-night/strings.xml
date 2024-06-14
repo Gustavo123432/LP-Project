@@ -21,4 +21,10 @@
     <string name="temperaturaMinima">Temperatura Minima Mar</string>
     <string name="direcaoOnda">Direção Onda</string>
     <string name="tem">Tema</string>
+    <string name="nomel">Nome</string>
+    <string name="favorito">Favorito</string>
+    <string name="temperatura">Temperatura</string>
+    <string name="max">Máxima</string>
+    <string name="Minima" />
+    <string name="addFav">Adicionar Favorito</string>
 </resources>

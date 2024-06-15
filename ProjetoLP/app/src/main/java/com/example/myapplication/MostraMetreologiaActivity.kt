@@ -40,6 +40,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -66,6 +67,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
     var districtGlobalIds = mutableMapOf<String, Int>()
     var tempoInfomationn = ArrayList<TempoInformation>()
     var uvInformation = ArrayList<UvInformation>()
+    var newData = HashMap<String, Any>()
 
     private val totalTime = 500
     private val interval = 100
@@ -310,9 +312,18 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 editor.putString("distrito", selectedDistrict)
                                 editor.putInt("position", position)
                                 editor.apply()
+
+
+
+
+
+
+
+
                                 estrelaColoridaImageView.setOnClickListener {
                                     removeItemFromDatabase(selectedDistrict)
                                 }
+
                                 estrelaImageView.setOnClickListener {
                                     sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
                                     val uid = sharedPreferences.getString("uidProfile", "")
@@ -348,8 +359,6 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                 }
 
 
-
-                                verFavorito()
 
                                 tempoInfomationn.clear()
                                 /*val customAdapterTempo = CustomAdapterTempo(tempoInfomationn, this@MostraMetreologiaActivity)
@@ -416,6 +425,52 @@ class MostraMetreologiaActivity : AppCompatActivity() {
             estrelaColoridaImageView.visibility = View.VISIBLE
             estrelaImageView.visibility = View.INVISIBLE
 
+            if (estrelaColoridaImageView.visibility == View.VISIBLE) {
+                val sharedPreferences = getSharedPreferences("profile", Context.MODE_PRIVATE)
+                val uid = sharedPreferences.getString("uidProfile", "") ?: return
+                val databaseReference = FirebaseDatabase.getInstance().reference.child("Perfil").child(uid).child("locais")
+
+                newData = hashMapOf(
+                    "imagem" to tempoInfomationn[0].tempoImage,
+                    "local" to selectedDistrict,
+                    "tmax" to tempoInfomationn[0].maxTemperatura,
+                    "tmin" to tempoInfomationn[0].minTemperatura
+                )
+
+                databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        var entryFound = false
+
+                        val genericTypeIndicator = object : GenericTypeIndicator<Map<String, Any>>() {}
+
+                        for (childSnapshot in dataSnapshot.children) {
+                            val childData = childSnapshot.getValue(genericTypeIndicator)
+                            if (childData?.get("local") == selectedDistrict) {
+                                // Update the existing entry
+                                databaseReference.child(childSnapshot.key!!).updateChildren(newData)
+                                    .addOnSuccessListener {
+                                        Log.e("Selected", "Entry updated successfully")
+                                    }
+                                    .addOnFailureListener {
+                                        Log.e("Selected", "Failed to update entry")
+                                    }
+                                entryFound = true
+                                break
+                            }
+                        }
+
+                        if (!entryFound) {
+                            Log.e("Selected", "Entry not found")
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        Toast.makeText(this@MostraMetreologiaActivity, "Erro ao acessar o banco de dados", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
+
+
         } else {
             estrelaColoridaImageView.visibility = View.INVISIBLE
             estrelaImageView.visibility = View.VISIBLE
@@ -455,6 +510,7 @@ class MostraMetreologiaActivity : AppCompatActivity() {
                                     conta = 1
                                 }
                                 uvUpdate()
+                                verFavorito()
                             }
                         } else {
                             Log.e("Response Error", "Response body is null")
